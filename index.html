@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta name="description" content="Emmanuel Samuel Ojima – Software Developer, Cyber Guru, and CEO of Maxigram. Specializing in AI architecture and cybersecurity.">
+<meta name="author" content="Emmanuel Samuel Ojima">
+<meta name="keywords" content="Emmanuel Samuel Ojima, software developer, cybersecurity, Maxigram, AI architect">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMMANUEL SAMUEL OJIMA | CEO MAXIGRAM</title>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Emmanuel Samuel Ojima",
+      "url": "https://your-vercel-domain.vercel.app",
+      "jobTitle": "Software Developer & CEO",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Maxigram"
+      },
+      "description": "Software Developer, Cyber Guru, and CEO of Maxigram. Expert in AI architecture and cybersecurity.",
+      "email": "samuelojimaemmanuel@gmail.com",
+      "telephone": "09033879819"
+    }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --grok-cyan: #00f2ff;
+            --grok-blue: #0066ff;
+            --deep-black: #020202;
+            --cyber-border: rgba(0, 242, 255, 0.15);
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--deep-black);
+            color: #e0e0e0;
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Scanning Laser Line */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: rgba(0, 242, 255, 0.15);
+            box-shadow: 0 0 15px var(--grok-cyan);
+            z-index: 999;
+            animation: scan 6s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: -10%; }
+            100% { top: 110%; }
+        }
+
+        #particles-js {
+            position: fixed; width: 100%; height: 100%; z-index: 0;
+            background: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #020202 100%);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            padding: 20px;
+        }
+
+        .system-id {
+            font-family: 'JetBrains Mono';
+            color: var(--grok-cyan);
+            font-size: 0.7rem;
+            letter-spacing: 5px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .glitch-text {
+            font-size: clamp(2rem, 8vw, 5.5rem);
+            font-weight: 700;
+            text-align: center;
+            line-height: 1;
+            margin: 0;
+            background: linear-gradient(to bottom, #fff 40%, #444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        /* Terminal Interface */
+        .terminal-container {
+            width: 100%;
+            max-width: 700px;
+            margin-top: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--cyber-border);
+            border-radius: 4px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .terminal-header {
+            background: var(--glass);
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--cyber-border);
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #222; }
+        .dot.cyan { background: var(--grok-cyan); box-shadow: 0 0 8px var(--grok-cyan); }
+
+        .terminal-body {
+            padding: 25px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            min-height: 180px;
+            color: #aaa;
+        }
+
+        .line { margin-bottom: 10px; line-height: 1.4; }
+        .cyan-text { color: var(--grok-cyan); }
+        .input-row { display: flex; align-items: center; margin-top: 15px; }
+        
+        input {
+            background: transparent; border: none; color: white;
+            outline: none; font-family: inherit; width: 100%;
+            padding-left: 10px; font-size: 0.9rem;
+        }
+
+        /* Profile & Grid System */
+        .content-wrap {
+            position: relative;
+            z-index: 1;
+            background: var(--deep-black);
+            border-top: 1px solid var(--cyber-border);
+        }
+
+        .profile-section {
+            padding: 80px 10%;
+            display: flex;
+            gap: 50px;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--cyber-border);
+        }
+
+        .profile-frame {
+            width: 200px; height: 200px;
+            border: 1px solid var(--grok-cyan);
+            position: relative;
+            padding: 10px;
+            background: linear-gradient(45deg, var(--deep-black), #111);
+        }
+
+        .profile-frame img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: grayscale(1) brightness(0.8);
+            transition: 0.5s;
+        }
+
+        .profile-frame:hover img { filter: grayscale(0) brightness(1); }
+
+        .profile-frame::before {
+            content: "ID_AUTH";
+            position: absolute;
+            bottom: -25px; left: 0;
+            font-size: 10px; font-family: 'JetBrains Mono';
+            color: var(--grok-cyan);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1px;
+            background: var(--cyber-border);
+        }
+
+        .grid-item {
+            background: var(--deep-black);
+            padding: 60px 40px;
+            transition: 0.4s;
+        }
+
+        .grid-item:hover { background: #050505; }
+        
+        .label {
+            font-family: 'JetBrains Mono';
+            color: var(--grok-cyan);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            display: block;
+            letter-spacing: 2px;
+        }
+
+        .status-tag {
+            font-size: 10px;
+            padding: 2px 8px;
+            border: 1px solid #444;
+            margin-left: 10px;
+            vertical-align: middle;
+            color: #888;
+        }
+
+        .coming-soon {
+            color: #ffaa00;
+            border-color: #ffaa00;
+        }
+
+        /* UI Elements */
+        .hud-corner {
+            position: fixed; top: 30px; right: 30px;
+            text-align: right; font-family: 'JetBrains Mono';
+            font-size: 0.65rem; color: #444; z-index: 10; line-height: 1.6;
+        }
+
+        .audio-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            padding: 12px 20px; border: 1px solid var(--grok-cyan);
+            background: transparent; color: var(--grok-cyan);
+            font-family: 'JetBrains Mono'; cursor: pointer;
+            z-index: 100; font-size: 0.7rem; letter-spacing: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .profile-section { flex-direction: column; text-align: center; padding: 40px 5%; }
+            .profile-frame { margin: 0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <div class="hud-corner">
+        CORE_V: 2.0.4<br>
+        STATUS: ENCRYPTED<br>
+        AUTH: SAMUEL_OJIMA
+    </div>
+
+    <button class="audio-btn" onclick="toggleAudio()" id="audio-toggle">
+        SIGNAL_OFF
+    </button>
+
+    <section class="hero">
+        <div class="system-id">Universal Intelligence Architect</div>
+        <h1 class="glitch-text">EMMANUEL<br>SAMUEL OJIMA</h1>
+        
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <div class="dot cyan"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+            <div class="terminal-body">
+                <div class="line cyan-text">> SESSION_START: 2024.MAXIGRAM</div>
+                <div class="line">> IDENTITY: EMMANUEL SAMUEL OJIMA</div>
+                <div class="line">> CLEARANCE: LEVEL_9_GURU</div>
+                <div id="output-log" class="line" style="color: #fff;">[SYSTEM] Enter command to reveal data...</div>
+                <div class="input-row">
+                    <span class="cyan-text">root@ojima:~$</span>
+                    <input type="text" id="terminal-input" placeholder="try 'maxigram' or 'help'" autofocus>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="content-wrap">
+        <section class="profile-section">
+            <div class="profile-frame">
+                <img src="profile.jpg" alt="Emmanuel Samuel Ojima">
+            </div>
+            <div>
+                <span class="label">Verified Identity</span>
+                <h2 style="font-size: 2.5rem; margin: 0; letter-spacing: -1px;">EMMANUEL SAMUEL OJIMA-OJO</h2>
+                <p style="color: var(--grok-cyan); font-family: 'JetBrains Mono'; margin-top: 5px;">SOFTWARE DEVELOPER // CYBER GURU // PRODUCER</p>
+                <p style="max-width: 600px; line-height: 1.6; opacity: 0.7;">
+                    Strategizing the intersection of artificial intelligence and cybersecurity. 
+                    Building robust, scalable architectures for the next evolution of the web. 
+                    Currently spearheading the Maxigram initiative.
+                </p>
+            </div>
+        </section>
+
+        <div class="grid">
+            <div class="grid-item">
+                <span class="label">Primary Initiative</span>
+                <h3>MAXIGRAM <span class="status-tag coming-soon">STEALTH MODE</span></h3>
+                <p>Developing a decentralized neural engine. Engineered to surpass current LLM constraints. Reality is being recalibrated.</p>
+            </div>
+            <div class="grid-item">
+                <span class="label">Cyber Operations</span>
+                <h3>SECURITY ARCHITECT</h3>
+                <p>Hardening digital assets against next-gen threats. Specializing in penetration testing and encrypted communication layers.</p>
+            </div>
+            <div class="grid-item">
+                <span class="label">Acoustic Logic</span>
+                <h3>MUSIC PRODUCTION</h3>
+                <p>Synthesizing science fiction soundscapes. Exploring the relationship between mathematical rhythm and human emotion.</p>
+            </div>
+        </div>
+        
+        <footer style="padding: 40px; text-align: center; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #333; border-top: 1px solid var(--cyber-border);">
+            &copy; 2024 E.S. OJIMA | DESIGNED FOR THE MULTIVERSE | EMAIL: samuelojimaemmanuel@gmail.com
+        </footer>
+    </div>
+
+    <script>
+        /* NEURAL NETWORK PARTICLES */
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#00f2ff" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.2 },
+                "size": { "value": 1 },
+                "line_linked": { "enable": true, "distance": 150, "color": "#00f2ff", "opacity": 0.1, "width": 1 },
+                "move": { "enable": true, "speed": 1 }
+            }
+        });
+
+        /* TERMINAL LOGIC */
+        const terminalInput = document.getElementById('terminal-input');
+        const outputLog = document.getElementById('output-log');
+
+        terminalInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const cmd = this.value.toLowerCase().trim();
+                let response = "";
+
+                if(cmd === 'help') response = "COMMANDS: [maxigram, contact, status, clear]";
+                else if(cmd === 'maxigram') response = "PROJECT STATUS: IN DEVELOPMENT. PREPARING FOR GLOBAL UPLINK.";
+                else if(cmd === 'contact') response = "TEL: 09033879819 | EMAIL: samuelojimaemmanuel@gmail.com";
+                else if(cmd === 'status') response = "ALL SYSTEMS GO. MAXIGRAM CORE IS STABLE.";
+                else if(cmd === 'clear') { outputLog.innerHTML = ""; this.value = ""; return; }
+                else response = "ACCESS DENIED. UNKNOWN COMMAND.";
+
+                outputLog.innerHTML = `<span class="cyan-text">> ${response}</span>`;
+                this.value = "";
+            }
+        });
+
+        function toggleAudio() {
+            const btn = document.getElementById('audio-toggle');
+            btn.innerText = btn.innerText === "SIGNAL_OFF" ? "SIGNAL_LIVE" : "SIGNAL_OFF";
+        }
+    </script>
+</body>
+</html>
