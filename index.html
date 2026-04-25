@@ -1,41 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
-    <meta name="description" content="Emmanuel Samuel Ojima – Software Developer, Cyber Guru, and CEO of Maxigram. Specializing in AI architecture and cybersecurity.">
-<meta name="author" content="Emmanuel Samuel Ojima">
-<meta name="keywords" content="Emmanuel Samuel Ojima, software developer, cybersecurity, Maxigram, AI architect">
+    <meta name="description" content="Emmanuel Samuel Ojima – Visionary AI & ML Architect, Cybersecurity Pioneer, and CEO of Maxigram. Redefining intelligence and digital defense.">
+    <meta name="author" content="Emmanuel Samuel Ojima">
+    <meta name="keywords" content="Emmanuel Samuel Ojima, AI architect, machine learning, cybersecurity, Maxigram, neural engines">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMMANUEL SAMUEL OJIMA | CEO MAXIGRAM</title>
+    <title>NEURAL CORE_01 // EMMANUEL SAMUEL OJIMA</title>
     
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Emmanuel Samuel Ojima",
-      "url": "https://your-vercel-domain.vercel.app",
-      "jobTitle": "Software Developer & CEO",
-      "worksFor": {
-        "@type": "Organization",
-        "name": "Maxigram"
-      },
-      "description": "Software Developer, Cyber Guru, and CEO of Maxigram. Expert in AI architecture and cybersecurity.",
-      "email": "samuelojimaemmanuel@gmail.com",
-      "telephone": "09033879819"
-    }
-    </script>
-
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --grok-cyan: #00f2ff;
-            --grok-blue: #0066ff;
             --deep-black: #020202;
-            --cyber-border: rgba(0, 242, 255, 0.15);
-            --glass: rgba(255, 255, 255, 0.03);
+            --cyber-border: rgba(0, 242, 255, 0.25);
+            --glass: rgba(255, 255, 255, 0.04);
         }
 
         body, html {
@@ -44,61 +25,75 @@
             color: #e0e0e0;
             font-family: 'Space Grotesk', sans-serif;
             overflow-x: hidden;
-            scroll-behavior: smooth;
+            position: relative;
         }
 
-        /* Scanning Laser Line */
+        #bg-layer {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        #particles-js {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 40%, #0a1a2a 0%, #020202 70%);
+        }
+
+        #matrix-rain {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0.45;
+            z-index: 1;
+            mix-blend-mode: screen;
+        }
+
         body::before {
             content: "";
             position: fixed;
             top: 0; left: 0;
-            width: 100%; height: 2px;
-            background: rgba(0, 242, 255, 0.15);
-            box-shadow: 0 0 15px var(--grok-cyan);
-            z-index: 999;
-            animation: scan 6s linear infinite;
+            width: 100%; height: 4px;
+            background: linear-gradient(90deg, transparent, var(--grok-cyan), transparent);
+            box-shadow: 0 0 30px var(--grok-cyan), 0 0 60px var(--grok-cyan);
+            z-index: 5;
+            animation: scan 3.5s linear infinite;
             pointer-events: none;
         }
 
         @keyframes scan {
-            0% { top: -10%; }
-            100% { top: 110%; }
+            0% { top: -5%; }
+            100% { top: 105%; }
         }
 
-        #particles-js {
-            position: fixed; width: 100%; height: 100%; z-index: 0;
-            background: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #020202 100%);
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 3px,
+                rgba(0, 242, 255, 0.08) 3px,
+                rgba(0, 242, 255, 0.08) 6px
+            );
+            z-index: 2;
+            pointer-events: none;
+            animation: flicker 6s infinite alternate;
         }
 
-        /* Hero Section */
-        .hero {
-            position: relative;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1;
-            padding: 20px;
-        }
-
-        .system-id {
-            font-family: 'JetBrains Mono';
-            color: var(--grok-cyan);
-            font-size: 0.7rem;
-            letter-spacing: 5px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
+        @keyframes flicker {
+            0%, 100% { opacity: 0.65; }
             50% { opacity: 0.4; }
         }
 
         .glitch-text {
-            font-size: clamp(2rem, 8vw, 5.5rem);
+            font-size: clamp(2.5rem, 8vw, 5.8rem);
             font-weight: 700;
             text-align: center;
             line-height: 1;
@@ -108,257 +103,283 @@
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
             letter-spacing: -2px;
+            animation: glitch 1.8s infinite alternate;
+            z-index: 10;
         }
 
-        /* Terminal Interface */
-        .terminal-container {
-            width: 100%;
-            max-width: 700px;
-            margin-top: 40px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--cyber-border);
-            border-radius: 4px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .terminal-header {
-            background: var(--glass);
-            padding: 10px 15px;
-            border-bottom: 1px solid var(--cyber-border);
-            display: flex;
-            gap: 8px;
-        }
-
-        .dot { width: 10px; height: 10px; border-radius: 50%; background: #222; }
-        .dot.cyan { background: var(--grok-cyan); box-shadow: 0 0 8px var(--grok-cyan); }
-
-        .terminal-body {
-            padding: 25px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            min-height: 180px;
-            color: #aaa;
-        }
-
-        .line { margin-bottom: 10px; line-height: 1.4; }
-        .cyan-text { color: var(--grok-cyan); }
-        .input-row { display: flex; align-items: center; margin-top: 15px; }
-        
-        input {
-            background: transparent; border: none; color: white;
-            outline: none; font-family: inherit; width: 100%;
-            padding-left: 10px; font-size: 0.9rem;
-        }
-
-        /* Profile & Grid System */
-        .content-wrap {
-            position: relative;
-            z-index: 1;
-            background: var(--deep-black);
-            border-top: 1px solid var(--cyber-border);
-        }
-
-        .profile-section {
-            padding: 80px 10%;
-            display: flex;
-            gap: 50px;
-            align-items: center;
-            flex-wrap: wrap;
-            border-bottom: 1px solid var(--cyber-border);
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-4px, 3px); }
+            40% { transform: translate(4px, -3px); }
+            100% { transform: translate(0); }
         }
 
         .profile-frame {
-            width: 200px; height: 200px;
-            border: 1px solid var(--grok-cyan);
+            width: 240px; height: 240px;
+            border: 2px solid var(--grok-cyan);
             position: relative;
-            padding: 10px;
-            background: linear-gradient(45deg, var(--deep-black), #111);
+            padding: 12px;
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.4);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            perspective: 1200px;
+            z-index: 10;
+        }
+
+        .profile-frame:hover {
+            transform: rotateX(12deg) rotateY(15deg) scale(1.05);
+            box-shadow: 0 0 70px rgba(0, 242, 255, 0.8);
         }
 
         .profile-frame img {
             width: 100%; height: 100%;
             object-fit: cover;
-            filter: grayscale(1) brightness(0.8);
-            transition: 0.5s;
+            filter: brightness(0.95);
+            transition: 0.6s;
         }
 
-        .profile-frame:hover img { filter: grayscale(0) brightness(1); }
+        .profile-frame:hover img { filter: brightness(1.1); }
 
-        .profile-frame::before {
-            content: "ID_AUTH";
+        .profile-frame::after {
+            content: "";
             position: absolute;
-            bottom: -25px; left: 0;
-            font-size: 10px; font-family: 'JetBrains Mono';
-            color: var(--grok-cyan);
+            top: -100%; left: -100%;
+            width: 50%; height: 300%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
+            transform: skewX(-25deg);
+            animation: holo-shine 6s infinite linear;
+            pointer-events: none;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1px;
-            background: var(--cyber-border);
+        @keyframes holo-shine {
+            0% { transform: translateX(-120%) translateY(-120%) skewX(-25deg); }
+            100% { transform: translateX(300%) translateY(300%) skewX(-25deg); }
         }
 
         .grid-item {
-            background: var(--deep-black);
-            padding: 60px 40px;
-            transition: 0.4s;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--cyber-border);
+            padding: 50px 35px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
         }
 
-        .grid-item:hover { background: #050505; }
-        
+        .grid-item:hover {
+            transform: translateY(-12px) scale(1.03);
+            border-color: var(--grok-cyan);
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.3);
+        }
+
         .label {
             font-family: 'JetBrains Mono';
             color: var(--grok-cyan);
-            font-size: 0.65rem;
+            font-size: 0.68rem;
             text-transform: uppercase;
-            margin-bottom: 20px;
-            display: block;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            margin-bottom: 18px;
         }
 
-        .status-tag {
-            font-size: 10px;
-            padding: 2px 8px;
-            border: 1px solid #444;
-            margin-left: 10px;
-            vertical-align: middle;
-            color: #888;
-        }
-
-        .coming-soon {
-            color: #ffaa00;
-            border-color: #ffaa00;
-        }
-
-        /* UI Elements */
         .hud-corner {
-            position: fixed; top: 30px; right: 30px;
-            text-align: right; font-family: 'JetBrains Mono';
-            font-size: 0.65rem; color: #444; z-index: 10; line-height: 1.6;
+            position: fixed; top: 25px; right: 25px;
+            font-family: 'JetBrains Mono'; font-size: 0.68rem; color: #666; 
+            z-index: 30; line-height: 1.7; text-shadow: 0 0 10px var(--grok-cyan);
         }
 
         .audio-btn {
             position: fixed; bottom: 30px; right: 30px;
-            padding: 12px 20px; border: 1px solid var(--grok-cyan);
+            padding: 12px 22px; border: 1px solid var(--grok-cyan);
             background: transparent; color: var(--grok-cyan);
             font-family: 'JetBrains Mono'; cursor: pointer;
-            z-index: 100; font-size: 0.7rem; letter-spacing: 2px;
+            z-index: 30; font-size: 0.72rem; letter-spacing: 2px;
+            transition: 0.3s;
         }
 
-        @media (max-width: 768px) {
-            .profile-section { flex-direction: column; text-align: center; padding: 40px 5%; }
-            .profile-frame { margin: 0 auto; }
+        .audio-btn:hover {
+            background: var(--grok-cyan);
+            color: #000;
+            box-shadow: 0 0 30px var(--grok-cyan);
+        }
+
+        .terminal-container {
+            background: rgba(0, 0, 0, 0.75);
+            border: 1px solid var(--cyber-border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            z-index: 15;
         }
     </style>
 </head>
 <body>
 
-    <div id="particles-js"></div>
+    <div id="bg-layer">
+        <div id="particles-js"></div>
+        <canvas id="matrix-rain"></canvas>
+    </div>
 
     <div class="hud-corner">
-        CORE_V: 2.0.4<br>
-        STATUS: ENCRYPTED<br>
-        AUTH: SAMUEL_OJIMA
+        CORE_V: 3.1.8<br>
+        STATUS: QUANTUM_ALIGNED<br>
+        NEURAL_LINK: ACTIVE<br>
+        ARCHITECT: OJIMA
     </div>
 
     <button class="audio-btn" onclick="toggleAudio()" id="audio-toggle">
         SIGNAL_OFF
     </button>
 
-    <section class="hero">
-        <div class="system-id">Universal Intelligence Architect</div>
+    <section style="height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; z-index: 10; padding: 20px;">
+        <div style="font-family: 'JetBrains Mono'; color: var(--grok-cyan); font-size: 0.75rem; letter-spacing: 6px; margin-bottom: 20px; animation: pulse 2s infinite;">UNIVERSAL NEURAL ARCHITECT</div>
+        
         <h1 class="glitch-text">EMMANUEL<br>SAMUEL OJIMA</h1>
         
-        <div class="terminal-container">
-            <div class="terminal-header">
-                <div class="dot cyan"></div><div class="dot"></div><div class="dot"></div>
+        <div class="terminal-container" style="width: 100%; max-width: 720px; margin-top: 50px; border-radius: 8px;">
+            <div style="background: rgba(10,10,10,0.9); padding: 12px 18px; display: flex; gap: 8px;">
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #00f2ff; box-shadow: 0 0 12px #00f2ff;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #444;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #444;"></div>
             </div>
-            <div class="terminal-body">
-                <div class="line cyan-text">> SESSION_START: 2024.MAXIGRAM</div>
-                <div class="line">> IDENTITY: EMMANUEL SAMUEL OJIMA</div>
-                <div class="line">> CLEARANCE: LEVEL_9_GURU</div>
-                <div id="output-log" class="line" style="color: #fff;">[SYSTEM] Enter command to reveal data...</div>
-                <div class="input-row">
-                    <span class="cyan-text">root@ojima:~$</span>
-                    <input type="text" id="terminal-input" placeholder="try 'maxigram' or 'help'" autofocus>
+            <div style="padding: 30px; font-family: 'JetBrains Mono'; font-size: 0.9rem; color: #aaa;">
+                <div style="color: var(--grok-cyan);">> SESSION_INIT: 2026.MAXIGRAM_NEXUS</div>
+                <div>> ARCHITECT_ID: EMMANUEL SAMUEL OJIMA</div>
+                <div>> CLEARANCE: OMEGA_NEURAL_GURU</div>
+                <div id="output-log" style="margin-top: 20px; color: #fff;">[CORE] Command the future...</div>
+                <div style="margin-top: 25px; display: flex; align-items: center;">
+                    <span style="color: var(--grok-cyan);">root@maxigram-core:\~$</span>
+                    <input type="text" id="terminal-input" placeholder="type 'help' | 'maxigram' | 'projects'" style="background: transparent; border: none; color: white; outline: none; flex: 1; margin-left: 10px; font-family: inherit; font-size: 0.9rem;">
                 </div>
             </div>
         </div>
     </section>
 
-    <div class="content-wrap">
-        <section class="profile-section">
+    <div style="position: relative; z-index: 10; background: var(--deep-black); border-top: 1px solid var(--cyber-border);">
+        <section style="padding: 100px 10%; display: flex; gap: 70px; align-items: center; flex-wrap: wrap;">
             <div class="profile-frame">
                 <img src="profile.jpg" alt="Emmanuel Samuel Ojima">
             </div>
-            <div>
-                <span class="label">Verified Identity</span>
-                <h2 style="font-size: 2.5rem; margin: 0; letter-spacing: -1px;">EMMANUEL SAMUEL OJIMA-OJO</h2>
-                <p style="color: var(--grok-cyan); font-family: 'JetBrains Mono'; margin-top: 5px;">SOFTWARE DEVELOPER // CYBER GURU // PRODUCER</p>
-                <p style="max-width: 600px; line-height: 1.6; opacity: 0.7;">
-                    Strategizing the intersection of artificial intelligence and cybersecurity. 
-                    Building robust, scalable architectures for the next evolution of the web. 
-                    Currently spearheading the Maxigram initiative.
+            <div style="flex: 1; max-width: 620px;">
+                <span class="label">NEURAL ENTITY VERIFIED • LEVEL ∞</span>
+                <h2 style="font-size: 3rem; margin: 0 0 15px; letter-spacing: -1.5px;">EMMANUEL SAMUEL OJIMA</h2>
+                <p style="color: var(--grok-cyan); font-family: 'JetBrains Mono'; font-size: 1.1rem;">AI/ML VISIONARY • CYBERSECURITY PIONEER • FOUNDER & CEO, MAXIGRAM</p>
+                <p style="line-height: 1.75; opacity: 0.9; font-size: 1.05rem;">
+                    I architect decentralized neural engines that transcend the limits of today's LLMs. 
+                    I forge quantum-resistant cybersecurity frameworks that protect the next evolution of intelligence. 
+                    From adversarial AI defense to real-time deepfake neutralization, I build systems that don't just react — they anticipate and redefine reality.
                 </p>
             </div>
         </section>
 
-        <div class="grid">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2px; background: var(--cyber-border);">
             <div class="grid-item">
-                <span class="label">Primary Initiative</span>
-                <h3>MAXIGRAM <span class="status-tag coming-soon">STEALTH MODE</span></h3>
-                <p>Developing a decentralized neural engine. Engineered to surpass current LLM constraints. Reality is being recalibrated.</p>
+                <span class="label">MAXIGRAM NEXUS</span>
+                <h3 style="font-size: 1.6rem; margin: 0 0 20px;">Decentralized Neural Singularity</h3>
+                <p>Engineering a global-scale, self-evolving AI infrastructure that breaks free from centralized LLM constraints. Capable of multi-modal reasoning, autonomous code evolution, and real-world agent orchestration.</p>
             </div>
             <div class="grid-item">
-                <span class="label">Cyber Operations</span>
-                <h3>SECURITY ARCHITECT</h3>
-                <p>Hardening digital assets against next-gen threats. Specializing in penetration testing and encrypted communication layers.</p>
+                <span class="label">QUANTUM CYBER OPS</span>
+                <h3 style="font-size: 1.6rem; margin: 0 0 20px;">Next-Gen Threat Neutralization</h3>
+                <p>Pioneering AI-driven penetration prediction, behavioral anomaly detection at petabyte scale, and holographic encryption layers that render traditional breaches obsolete.</p>
             </div>
             <div class="grid-item">
-                <span class="label">Acoustic Logic</span>
-                <h3>MUSIC PRODUCTION</h3>
-                <p>Synthesizing science fiction soundscapes. Exploring the relationship between mathematical rhythm and human emotion.</p>
+                <span class="label">ML & ACOUSTIC INTELLIGENCE</span>
+                <h3 style="font-size: 1.6rem; margin: 0 0 20px;">Sonic Neural Synthesis</h3>
+                <p>Merging advanced machine learning with mathematical rhythm to create emotionally resonant soundscapes and AI-generated music that adapts in real time to human neural patterns.</p>
+            </div>
+            <div class="grid-item">
+                <span class="label">ADVERSARIAL AI DEFENSE</span>
+                <h3 style="font-size: 1.6rem; margin: 0 0 20px;">Protecting the Future of Intelligence</h3>
+                <p>Building classifiers and detection systems against prompt injection, model poisoning, and deepfake threats — making AI systems unbreakable even under sophisticated adversarial attacks.</p>
             </div>
         </div>
-        
-        <footer style="padding: 40px; text-align: center; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: #333; border-top: 1px solid var(--cyber-border);">
-            &copy; 2024 E.S. OJIMA | DESIGNED FOR THE MULTIVERSE | EMAIL: samuelojimaemmanuel@gmail.com
+
+        <section style="padding: 100px 10%; background: #050505;">
+            <span class="label" style="text-align: center; display: block; margin-bottom: 40px;">NEURAL TIMELINE • KEY TRANSMISSIONS</span>
+            <div style="max-width: 900px; margin: 0 auto; font-family: 'JetBrains Mono'; line-height: 2;">
+                <div style="margin-bottom: 50px; border-left: 3px solid var(--grok-cyan); padding-left: 30px;">
+                    <strong style="color: var(--grok-cyan);">2026 — Present</strong><br>
+                    Awakening Maxigram: Decentralized neural core capable of surpassing current LLM boundaries in reasoning depth and autonomy.
+                </div>
+                <div style="margin-bottom: 50px; border-left: 3px solid var(--grok-cyan); padding-left: 30px;">
+                    <strong style="color: var(--grok-cyan);">2025</strong><br>
+                    Designed and deployed AI-powered real-time deepfake audio/video detection systems for critical communication infrastructure.
+                </div>
+                <div style="margin-bottom: 50px; border-left: 3px solid var(--grok-cyan); padding-left: 30px;">
+                    <strong style="color: var(--grok-cyan);">2024 — 2025</strong><br>
+                    Architected adversarial ML defenses and prompt injection firewalls that have been battle-tested against state-level threat actors.
+                </div>
+            </div>
+        </section>
+
+        <footer style="padding: 60px 20px; text-align: center; font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #444; border-top: 1px solid var(--cyber-border);">
+            &copy; 2026 EMMANUEL SAMUEL OJIMA | TRANSMITTING FROM THE EDGE OF INTELLIGENCE | 
+            <span style="color: var(--grok-cyan);">samuelojimaemmanuel@gmail.com</span>
         </footer>
     </div>
 
     <script>
-        /* NEURAL NETWORK PARTICLES */
         particlesJS("particles-js", {
             "particles": {
-                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "number": { "value": 110 },
                 "color": { "value": "#00f2ff" },
                 "shape": { "type": "circle" },
-                "opacity": { "value": 0.2 },
-                "size": { "value": 1 },
-                "line_linked": { "enable": true, "distance": 150, "color": "#00f2ff", "opacity": 0.1, "width": 1 },
-                "move": { "enable": true, "speed": 1 }
+                "opacity": { "value": 0.25, "random": true },
+                "size": { "value": 2.5 },
+                "line_linked": { "enable": true, "distance": 150, "color": "#00f2ff", "opacity": 0.18, "width": 1 },
+                "move": { "enable": true, "speed": 1.5 }
             }
         });
 
-        /* TERMINAL LOGIC */
+        const canvas = document.getElementById('matrix-rain');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const chars = "01アイウエオ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawRain() {
+            ctx.fillStyle = 'rgba(2, 2, 2, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00f2ff';
+            ctx.font = `${fontSize}px monospace`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawRain, 45);
+
         const terminalInput = document.getElementById('terminal-input');
         const outputLog = document.getElementById('output-log');
 
         terminalInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 const cmd = this.value.toLowerCase().trim();
-                let response = "";
+                let response = "SIGNAL FRAGMENTED.";
 
-                if(cmd === 'help') response = "COMMANDS: [maxigram, contact, status, clear]";
-                else if(cmd === 'maxigram') response = "PROJECT STATUS: IN DEVELOPMENT. PREPARING FOR GLOBAL UPLINK.";
-                else if(cmd === 'contact') response = "TEL: 09033879819 | EMAIL: samuelojimaemmanuel@gmail.com";
-                else if(cmd === 'status') response = "ALL SYSTEMS GO. MAXIGRAM CORE IS STABLE.";
-                else if(cmd === 'clear') { outputLog.innerHTML = ""; this.value = ""; return; }
-                else response = "ACCESS DENIED. UNKNOWN COMMAND.";
+                if (cmd === 'help') response = "COMMANDS: maxigram | projects | status | contact";
+                else if (cmd === 'maxigram') response = "NEURAL CORE AWAKENING. GLOBAL UPLINK IMMINENT.";
+                else if (cmd === 'projects') response = "ADVERSARIAL DEFENSE • DEEPFAKE NEUTRALIZER • QUANTUM ENCRYPTION";
+                else if (cmd === 'status') response = "ALL NEURAL NODES ALIGNED. FIELD STRENGTH: 99.7%";
+                else if (cmd === 'contact') response = "09033879819 | samuelojimaemmanuel@gmail.com";
 
-                outputLog.innerHTML = `<span class="cyan-text">> ${response}</span>`;
+                outputLog.innerHTML = `<span style="color: var(--grok-cyan);">> ${response}</span>`;
                 this.value = "";
             }
         });
@@ -369,4 +390,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
