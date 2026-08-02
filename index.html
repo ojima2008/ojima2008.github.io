@@ -294,100 +294,1233 @@
         </div>
 
         <section style="padding: 100px 10%; background: #050505;">
-            <span class="label" style="text-align: center; display: block; margin-bottom: 40px;">NEURAL TIMELINE • KEY TRANSMISSIONS</span>
-            <div style="max-width: 900px; margin: 0 auto; font-family: 'JetBrains Mono'; line-height: 2;">
-                <div style="margin-bottom: 50px; border-left: 3px solid var(--grok-cyan); padding-left: 30px;">
-                    <strong style="color: var(--grok-cyan);">2026 — Present</strong><br>
-                    Awakening Maxigram: Decentralized neural core capable of surpassing current LLM boundaries in reasoning depth and autonomy.
-                </div>
-                <div style="margin-bottom: 50px; border-left: 3px solid var(--grok-cyan); padding-left: 30px;">
-                    <strong style="color: var(--grok-cyan);">2025</strong><br>
-                    Designed and deployed AI-powered real-time deepfake audio/video detection systems for critical communication infrastructure.
-                </div>
-                <div style="margin-bottom: 50px; border-left: 3px solid var(--grok-cyan); padding-left: 30px;">
-                    <strong style="color: var(--grok-cyan);">2024 — 2025</strong><br>
-                    Architected adversarial ML defenses and prompt injection firewalls that have been battle-tested against state-level threat actors.
-                </div>
-            </div>
-        </section>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>ORBITAL — Satellite Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-        <footer style="padding: 60px 20px; text-align: center; font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #444; border-top: 1px solid var(--cyber-border);">
-            &copy; 2026 EMMANUEL SAMUEL OJIMA | TRANSMITTING FROM THE EDGE OF INTELLIGENCE | 
-            <span style="color: var(--grok-cyan);">samuelojimaemmanuel@gmail.com</span>
-        </footer>
+<!-- ============================================================================
+     ORBITAL — single-file build.
+     Everything (propagation engine, collision detection, 3D globe, UI) runs
+     entirely in this one HTML file, in the browser, with no build step and
+     no backend server. It fetches live Starlink TLEs directly from CelesTrak
+     and does real SGP4 propagation client-side. For a production deployment
+     with a durable API, WebSocket push, and Postgres history, use the full
+     server/client project instead — this file trades that architecture for
+     "double-click and it just runs."
+     ============================================================================ -->
+
+<script>
+  // Diagnostic bootstrap — defined FIRST, before any CDN script, so it can
+  // catch failures in loading those scripts themselves (not just runtime
+  // errors in our own code afterward).
+  window.__bootLog = [];
+  window.__bootFailed = function (label) {
+    window.__bootLog.push('FAILED TO LOAD: ' + label);
+    window.__renderBootError();
+  };
+  window.__renderBootError = function () {
+    var pre = document.getElementById('boot-error');
+    if (!pre) return; // body not parsed yet; renderBootError re-runs later too
+    pre.style.display = 'block';
+    pre.textContent = window.__bootLog.join('\n');
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js" onerror="window.__bootFailed('React (cdn.jsdelivr.net)')"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js" onerror="window.__bootFailed('ReactDOM (cdn.jsdelivr.net)')"></script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js" onerror="window.__bootFailed('Babel standalone (cdn.jsdelivr.net)')"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js" onerror="window.__bootFailed('Three.js (cdn.jsdelivr.net)')"></script>
+<script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js" onerror="window.__bootFailed('satellite.js (cdn.jsdelivr.net)')"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js" onerror="window.__bootFailed('topojson-client (cdn.jsdelivr.net) — non-fatal, borders will just be skipped')"></script>
+
+<style>
+:root{
+  --void:#05070d; --panel:rgba(14,20,32,.62); --panel-solid:#0d1220;
+  --panel-border:rgba(126,178,214,.16); --panel-border-strong:rgba(126,178,214,.32);
+  --cyan:#54f2ff; --cyan-dim:#2b8a9e; --amber:#ffb454; --danger:#ff4d6d;
+  --success:#35e28f; --moderate:#ffd166; --text-primary:#e9eff7;
+  --text-dim:#8492ab; --text-faint:#4c5670;
+  --font-display:'Space Grotesk','Inter',sans-serif; --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono','SFMono-Regular',monospace;
+  --header-h:60px; --sidebar-w:76px; --radius:10px; --radius-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{height:100%}
+body{background:radial-gradient(ellipse at 20% -10%,#0d1830 0%,var(--void) 45%) fixed;color:var(--text-primary);font-family:var(--font-body);-webkit-font-smoothing:antialiased;overflow:hidden}
+::-webkit-scrollbar{width:8px;height:8px} ::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(126,178,214,.25);border-radius:8px}
+a{color:inherit;text-decoration:none} button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+.app-shell{height:100vh;width:100vw;display:grid;grid-template-columns:var(--sidebar-w) 1fr;grid-template-rows:var(--header-h) 1fr;grid-template-areas:"sidebar header" "sidebar main"}
+.app-header{grid-area:header} .app-sidebar{grid-area:sidebar} .app-main{grid-area:main;position:relative;overflow:hidden}
+
+.glass{background:var(--panel);border:1px solid var(--panel-border);border-radius:var(--radius);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);box-shadow:0 8px 32px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03)}
+.glass-corner{position:relative}
+.glass-corner::before,.glass-corner::after{content:'';position:absolute;width:10px;height:10px;border:1.5px solid var(--cyan-dim);opacity:.7;pointer-events:none}
+.glass-corner::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+.glass-corner::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+
+.eyebrow{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan-dim)}
+.mono{font-family:var(--font-mono)} .data-value{font-family:var(--font-mono);font-weight:600;color:var(--text-primary)}
+
+@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulseDot{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(84,242,255,.5)}50%{opacity:.6;box-shadow:0 0 0 6px rgba(84,242,255,0)}}
+@keyframes scanSweep{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--success);display:inline-block;animation:pulseDot 2.4s ease-in-out infinite}
+.status-dot.warn{background:var(--amber)} .status-dot.danger{background:var(--danger)}
+
+.btn{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--panel-border-strong);background:rgba(84,242,255,.06);color:var(--text-primary);transition:all .15s ease}
+.btn:hover{background:rgba(84,242,255,.14);border-color:var(--cyan)}
+.panel-scroll{overflow-y:auto;overflow-x:hidden}
+
+.risk-badge{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:20px;border:1px solid currentColor;display:inline-flex;align-items:center;gap:4px}
+.risk-critical{color:var(--danger);background:rgba(255,77,109,.1)}
+.risk-high{color:#ff9166;background:rgba(255,145,102,.1)}
+.risk-moderate{color:var(--moderate);background:rgba(255,209,102,.1)}
+.risk-low{color:var(--success);background:rgba(53,226,143,.1)}
+
+/* header/sidebar */
+.header-inner{height:var(--header-h);display:flex;align-items:center;justify-content:space-between;padding:0 20px;gap:24px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-title{font-family:var(--font-display);font-weight:700;font-size:16px;letter-spacing:.08em;line-height:1}
+.brand-sub{margin-top:2px;font-size:9px}
+.header-mid{display:flex;gap:28px} .header-stat{display:flex;flex-direction:column;gap:2px} .header-stat .data-value{font-size:13px}
+.header-right{display:flex;align-items:center;gap:18px}
+.conn-pill{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.06em;padding:5px 10px;border-radius:20px;border:1px solid var(--panel-border);color:var(--text-dim)}
+.clock{font-size:12px;color:var(--text-dim);min-width:80px;text-align:right}
+@media (max-width:860px){.header-mid{display:none}.brand-sub{display:none}}
+
+.sidebar-items{display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:14px}
+.sidebar-btn{position:relative;width:54px;height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid transparent;border-radius:var(--radius-sm);color:var(--text-dim);transition:all .15s ease}
+.sidebar-btn:hover{color:var(--text-primary);background:rgba(84,242,255,.06)}
+.sidebar-btn.active{color:var(--cyan);background:rgba(84,242,255,.1);border-color:rgba(84,242,255,.3)}
+.sidebar-label{font-family:var(--font-mono);font-size:8px;letter-spacing:.04em;text-transform:uppercase}
+.sidebar-badge{position:absolute;top:4px;right:8px;background:var(--danger);color:#fff;font-size:9px;font-family:var(--font-mono);min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px}
+@media (max-width:640px){:root{--sidebar-w:58px}.sidebar-label{display:none}.sidebar-btn{width:42px;height:42px}}
+
+.loading-screen{position:fixed;inset:0;background:var(--void);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:1000}
+.loading-ring{width:74px;height:74px;border-radius:50%;border:2px solid rgba(84,242,255,.15);border-top-color:var(--cyan);animation:scanSweep 1.1s linear infinite}
+.loading-title{font-family:var(--font-display);letter-spacing:.12em;font-size:14px}
+.loading-sub{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:.04em;text-align:center;margin-top:6px}
+
+/* panels */
+.panel{display:flex;flex-direction:column;animation:fadeInUp .35s ease both;height:100%}
+.panel-header{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--panel-border)}
+.panel-title{font-family:var(--font-display);font-size:14px;font-weight:600;margin-top:2px}
+.panel-body{padding:14px 16px;flex:1;min-height:0}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:32px 12px;color:var(--text-faint);text-align:center}
+.field-label{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;display:block}
+.text-input,.select-input{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--panel-border-strong);border-radius:var(--radius-sm);color:var(--text-primary);padding:8px 10px;font-size:13px;font-family:var(--font-body)}
+.text-input:focus,.select-input:focus{border-color:var(--cyan)}
+.row{display:flex;gap:10px} .row>*{flex:1}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.kv-item{display:flex;flex-direction:column;gap:3px}
+.kv-label{font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase}
+.kv-value{font-family:var(--font-mono);font-size:14px;font-weight:600}
+
+/* dashboard */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.stat-card{background:rgba(255,255,255,.02);border:1px solid var(--panel-border);border-left:2px solid var(--cyan);border-radius:var(--radius-sm);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.stat-card.accent-amber{border-left-color:var(--amber)} .stat-card.accent-danger{border-left-color:var(--danger)} .stat-card.accent-success{border-left-color:var(--success)}
+.stat-value{font-family:var(--font-mono);font-size:22px;font-weight:700;line-height:1.1}
+.stat-unit{font-size:11px;color:var(--text-dim);margin-left:4px;font-weight:500}
+.stat-trend{font-family:var(--font-mono);font-size:10px;color:var(--text-dim)}
+.dashboard-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+@media (max-width:900px){.dashboard-grid{grid-template-columns:1fr}}
+.placeholder-chart{height:140px;display:flex;align-items:flex-end;gap:4px;padding:8px 4px}
+.placeholder-bar{flex:1;background:linear-gradient(to top,rgba(84,242,255,.35),rgba(84,242,255,.05));border-radius:2px 2px 0 0}
+.placeholder-note{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);margin-top:6px}
+.bar-chart{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:grid;grid-template-columns:150px 1fr 44px;gap:10px;align-items:center}
+.bar-row-label{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{height:10px;border-radius:5px;background:rgba(255,255,255,.04);overflow:hidden}
+.bar-fill{height:100%;border-radius:5px}
+.bar-row-value{font-family:var(--font-mono);font-size:11px;color:var(--text-primary);text-align:right}
+
+.vitals-strip{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;padding:4px 6px;z-index:5}
+.vitals-item{padding:8px 18px;display:flex;flex-direction:column;gap:2px;border-right:1px solid var(--panel-border);min-width:100px}
+.vitals-item:last-child{border-right:none} .vitals-item .data-value{font-size:15px}
+@media (max-width:760px){.vitals-strip{display:none}}
+
+/* explorer */
+.explorer-body{display:flex;flex-direction:column;min-height:0;flex:1}
+.explorer-list{margin-top:14px;display:flex;flex-direction:column;gap:4px;flex:1;min-height:0}
+.explorer-row{display:flex;flex-direction:column;gap:4px;text-align:left;background:rgba(255,255,255,.015);border:1px solid transparent;border-radius:var(--radius-sm);padding:8px 10px;transition:all .12s ease}
+.explorer-row:hover{background:rgba(84,242,255,.06)}
+.explorer-row.active{background:rgba(84,242,255,.12);border-color:rgba(84,242,255,.35)}
+.explorer-row-main{display:flex;justify-content:space-between;align-items:baseline}
+.explorer-name{font-size:12.5px;font-weight:500} .explorer-norad{font-size:10px;color:var(--text-dim)}
+.explorer-row-meta{display:flex;gap:12px;font-size:10.5px;color:var(--text-dim)}
+.tle-block{background:rgba(0,0,0,.25);border:1px solid var(--panel-border);border-radius:var(--radius-sm);padding:10px 12px;font-size:10.5px;line-height:1.6;color:var(--cyan);overflow-x:auto;white-space:pre}
+.track-preview{max-height:180px;display:flex;flex-direction:column;gap:2px}
+.track-row{display:grid;grid-template-columns:50px 1fr 70px;gap:8px;font-size:10.5px;color:var(--text-dim);padding:4px 6px;border-radius:4px}
+.track-row:hover{background:rgba(255,255,255,.03);color:var(--text-primary)}
+
+/* collisions */
+.risk-summary{display:flex;gap:10px;margin-bottom:14px}
+.risk-summary-item{flex:1;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.02);border:1px solid var(--panel-border);border-radius:var(--radius-sm);padding:8px 10px}
+.collision-list{display:flex;flex-direction:column;gap:6px;max-height:320px}
+.collision-row{text-align:left;background:rgba(255,255,255,.015);border:1px solid var(--panel-border);border-radius:var(--radius-sm);padding:10px 12px;display:flex;flex-direction:column;gap:6px;transition:background .12s ease}
+.collision-row:hover{background:rgba(255,77,109,.06);border-color:rgba(255,77,109,.3)}
+.collision-row-top{display:flex;justify-content:space-between;align-items:center}
+.collision-sep{font-size:12px;font-weight:600}
+.collision-row-names{display:flex;gap:8px;align-items:center;font-size:12px}
+.collision-x{color:var(--text-faint)}
+.collision-row-meta{font-size:10px;color:var(--text-dim)}
+
+/* analytics */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:900px){.analytics-grid{grid-template-columns:1fr}}
+.chart-card{background:rgba(255,255,255,.015);border:1px solid var(--panel-border);border-radius:var(--radius-sm);padding:12px}
+.activity-heat{display:grid;grid-template-columns:repeat(24,1fr);gap:3px}
+.activity-cell{height:22px;border-radius:3px;background:var(--cyan)}
+
+/* overlay docking */
+.globe-canvas-host{position:absolute;inset:0;z-index:0}
+.overlay-panel{position:absolute;z-index:5;pointer-events:none}
+.overlay-panel .panel{pointer-events:auto}
+.overlay-left{top:16px;left:16px;bottom:16px;width:340px}
+.overlay-right{top:16px;right:16px;bottom:16px;width:360px}
+.overlay-full{top:16px;left:16px;right:16px;bottom:16px}
+.overlay-full .panel{max-width:1100px;margin:0 auto}
+.overlay-center{top:40%;left:50%;transform:translate(-50%,-50%);width:320px}
+@media (max-width:860px){.overlay-left,.overlay-right{left:10px;right:10px;top:10px;bottom:10px;width:auto}}
+</style>
+</head>
+<body>
+<div id="root"><div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#54f2ff;font-family:monospace;font-size:13px;letter-spacing:.05em;">BOOTING ORBITAL…</div></div>
+<pre id="boot-error" style="display:none;position:fixed;inset:16px;z-index:9999;background:#1a0508;color:#ff8fa3;padding:16px;font-family:monospace;font-size:12px;white-space:pre-wrap;border:1px solid #ff4d6d;border-radius:8px;overflow:auto;max-height:80vh;"></pre>
+<script>
+  function showBootError(msg) {
+    var el = document.getElementById('boot-error');
+    el.style.display = 'block';
+    el.textContent += (el.textContent ? '\n\n' : '') + msg;
+  }
+  // Flush anything captured before this point (e.g. a CDN <script> tag
+  // that failed to load, caught by the onerror="" attributes in <head>).
+  if (window.__bootLog && window.__bootLog.length) {
+    window.__bootLog.forEach(showBootError);
+  }
+  window.__renderBootError = function () {
+    var el = document.getElementById('boot-error');
+    if (el) { el.style.display = 'block'; el.textContent = window.__bootLog.join('\n'); }
+  };
+  // capture:true so this also catches resource-load failures (img/script/link)
+  // that fire only in the capture phase, not just runtime JS exceptions.
+  window.addEventListener('error', function (e) {
+    var msg = e.message || (e.target && e.target.src ? 'Failed to load resource: ' + e.target.src : 'unknown error');
+    showBootError('ERROR: ' + msg + (e.filename ? ('\n  at ' + e.filename + ':' + e.lineno) : ''));
+  }, true);
+  window.addEventListener('unhandledrejection', function (e) {
+    var reason = e.reason && e.reason.message ? e.reason.message : String(e.reason);
+    showBootError('UNHANDLED PROMISE REJECTION: ' + reason);
+  });
+  if (location.protocol === 'file:') {
+    showBootError(
+      'You opened this file directly (file:// URL). Browsers block network requests ' +
+      '(live TLE fetch, map data, fonts) from file:// pages.\n\n' +
+      'Fix: serve this folder over local HTTP instead, e.g.:\n' +
+      '  python3 -m http.server 8000\n' +
+      'then open  http://localhost:8000/orbital-single-file.html\n\n' +
+      '(The app will still try to run below — this banner is just a heads-up.)'
+    );
+  }
+  // Watchdog: if the app hasn't finished mounting within 12s, something is
+  // stuck (usually a slow/blocked CDN on the current network) — say so
+  // explicitly instead of leaving "BOOTING ORBITAL…" up forever.
+  window.__orbitalMounted = false;
+  setTimeout(function () {
+    if (!window.__orbitalMounted) {
+      showBootError(
+        'STILL BOOTING AFTER 12s — something did not load.\n\n' +
+        'Checks:\n' +
+        '  1. Is your internet connection active right now?\n' +
+        '  2. Open this same URL in a different browser (or disable any ad-blocker/VPN) and see if it loads faster.\n' +
+        '  3. Check window.__bootLog in the browser console for which script failed.\n' +
+        '  4. Try reloading — CDNs occasionally have transient hiccups.'
+      );
+    }
+  }, 12000);
+</script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+/* ============================================================================
+   1. ORBITAL MATH HELPERS
+   ============================================================================ */
+const EARTH_RADIUS_KM = 6371;
+const EARTH_RADIUS_UNITS = 2;
+
+function geodeticToVector3(latDeg, lonDeg, altitudeKm = 0, earthRadiusKm = EARTH_RADIUS_KM) {
+  const scale = EARTH_RADIUS_UNITS / earthRadiusKm;
+  const radius = (earthRadiusKm + altitudeKm) * scale;
+  const lat = (latDeg * Math.PI) / 180;
+  const lon = (lonDeg * Math.PI) / 180;
+  return {
+    x: radius * Math.cos(lat) * Math.cos(lon),
+    y: radius * Math.sin(lat),
+    z: -radius * Math.cos(lat) * Math.sin(lon),
+  };
+}
+function classifyShell(altitudeKm) {
+  if (altitudeKm < 400) return 'VLEO (<400km)';
+  if (altitudeKm < 500) return 'Shell 1 (400-500km)';
+  if (altitudeKm < 550) return 'Shell 2 (500-550km)';
+  if (altitudeKm < 570) return 'Shell 3 (550-570km)';
+  if (altitudeKm < 600) return 'Shell 4 (570-600km)';
+  return 'Extended (>600km)';
+}
+function formatNumber(n, digits = 2) {
+  if (n === null || n === undefined || Number.isNaN(n)) return '—';
+  return Number(n).toLocaleString(undefined, { maximumFractionDigits: digits });
+}
+function formatDuration(minutes) {
+  if (minutes === null || minutes === undefined) return '—';
+  const h = Math.floor(minutes / 60); const m = Math.round(minutes % 60);
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+function timeAgo(isoString) {
+  if (!isoString) return '—';
+  const s = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
+  if (s < 60) return `${s}s ago`;
+  const m = Math.floor(s / 60); if (m < 60) return `${m}m ago`;
+  return `${Math.floor(m / 60)}h ago`;
+}
+const toDeg = (rad) => (rad * 180) / Math.PI;
+
+/* ============================================================================
+   2. SPATIAL GRID (for O(n)-ish nearest-neighbour conjunction scans)
+   ============================================================================ */
+class SpatialGrid {
+  constructor(cellSizeKm = 25) { this.cellSize = cellSizeKm; this.cells = new Map(); }
+  _key(x, y, z) { return `${Math.floor(x/this.cellSize)},${Math.floor(y/this.cellSize)},${Math.floor(z/this.cellSize)}`; }
+  insert(item, x, y, z) {
+    const k = this._key(x, y, z);
+    if (!this.cells.has(k)) this.cells.set(k, []);
+    this.cells.get(k).push({ item, x, y, z });
+  }
+  queryNeighborCells(x, y, z) {
+    const cx = Math.floor(x/this.cellSize), cy = Math.floor(y/this.cellSize), cz = Math.floor(z/this.cellSize);
+    const out = [];
+    for (let dx=-1; dx<=1; dx++) for (let dy=-1; dy<=1; dy++) for (let dz=-1; dz<=1; dz++) {
+      const b = this.cells.get(`${cx+dx},${cy+dy},${cz+dz}`);
+      if (b) out.push(...b);
+    }
+    return out;
+  }
+}
+
+/* ============================================================================
+   3. LIVE PROPAGATION + COLLISION ENGINE (runs entirely client-side)
+   ============================================================================ */
+const CELESTRAK_URL = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle';
+const WARNING_KM = 25, CRITICAL_KM = 5;
+
+const SEED_TLE = `STARLINK-1007
+1 44713U 19074A   24001.50000000  .00001234  00000-0  89000-4 0  9995
+2 44713  53.0533  95.4700 0001234  90.0000 270.0000 15.06400000000012
+STARLINK-1008
+1 44714U 19074B   24001.50000000  .00001300  00000-0  91000-4 0  9992
+2 44714  53.0540  95.4800 0001300  91.0000 269.0000 15.06390000000019
+STARLINK-1130
+1 45178U 20001A   24001.50000000  .00001100  00000-0  85000-4 0  9998
+2 45178  53.0000 120.0000 0001100  85.0000 275.0000 15.06200000000021
+STARLINK-1131
+1 45179U 20001B   24001.50000000  .00001150  00000-0  86000-4 0  9990
+2 45179  53.0010 120.1000 0001150  86.0000 274.0000 15.06210000000015
+STARLINK-2001
+1 47301U 21001A   24001.50000000  .00001500  00000-0  95000-4 0  9997
+2 47301  53.2000 200.0000 0001500  70.0000 290.0000 15.07100000000018`;
+
+class Engine {
+  constructor() {
+    this.satrecs = new Map();      // noradId -> {satrec, name, line1, line2}
+    this.satellites = [];          // latest propagated state array
+    this.trails = new Map();       // noradId -> [{lat,lon,alt,t}]
+    this.collisionPairs = [];
+    this.shellCongestion = [];
+    this.timeSeries = [];
+    this.collisionHistory = [];
+    this.meta = { tleCount: 0, tleFetchedAt: null, tleError: null, lastTickAt: null, lastScanAt: null };
+    this.listeners = new Set();
+  }
+  subscribe(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
+  emit() { this.listeners.forEach((fn) => fn()); }
+
+  parseTLE(text) {
+    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    const out = new Map();
+    for (let i = 0; i + 2 < lines.length + 1; i += 3) {
+      const name = lines[i], l1 = lines[i+1], l2 = lines[i+2];
+      if (!name || !l1 || !l2 || !l1.startsWith('1 ') || !l2.startsWith('2 ')) continue;
+      const noradId = l1.substring(2, 7).trim();
+      out.set(noradId, { name: name.replace(/^0 /, '').trim(), noradId, line1: l1, line2: l2 });
+    }
+    return out;
+  }
+
+  async fetchTLE() {
+    try {
+      const res = await fetch(CELESTRAK_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`CelesTrak responded ${res.status}`);
+      const text = await res.text();
+      const records = this.parseTLE(text);
+      if (records.size === 0) throw new Error('Parsed zero TLE records');
+      this._buildSatrecs(records);
+      this.meta.tleCount = records.size;
+      this.meta.tleFetchedAt = new Date().toISOString();
+      this.meta.tleError = null;
+    } catch (err) {
+      console.warn('[engine] live TLE fetch failed, using seed data:', err.message);
+      this.meta.tleError = err.message;
+      if (this.satrecs.size === 0) {
+        this._buildSatrecs(this.parseTLE(SEED_TLE));
+        this.meta.tleCount = this.satrecs.size;
+        this.meta.tleFetchedAt = new Date().toISOString();
+      }
+    }
+    this.emit();
+  }
+
+  _buildSatrecs(records) {
+    const next = new Map();
+    for (const rec of records.values()) {
+      try {
+        const satrec = satellite.twoline2satrec(rec.line1, rec.line2);
+        if (satrec.error !== 0) continue;
+        next.set(rec.noradId, { satrec, name: rec.name, noradId: rec.noradId, line1: rec.line1, line2: rec.line2 });
+      } catch { /* skip malformed record */ }
+    }
+    this.satrecs = next;
+  }
+
+  _computeState(entry, date) {
+    const { satrec, name, noradId } = entry;
+    const posVel = satellite.propagate(satrec, date);
+    if (!posVel || !posVel.position || typeof posVel.position === 'boolean') return null;
+    const gmst = satellite.gstime(date);
+    const geo = satellite.eciToGeodetic(posVel.position, gmst);
+    const latitude = toDeg(geo.latitude);
+    const longitude = ((toDeg(geo.longitude) + 540) % 360) - 180;
+    const altitude = geo.height;
+    const v = posVel.velocity;
+    const speed = Math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    const periodMinutes = (2 * Math.PI) / satrec.no;
+    return {
+      noradId, name, latitude, longitude, altitude, speed,
+      inclination: toDeg(satrec.inclo), eccentricity: satrec.ecco, periodMinutes,
+      shell: classifyShell(altitude),
+      eci: { x: posVel.position.x, y: posVel.position.y, z: posVel.position.z },
+      revNumber: satrec.revnum ?? null, epochYear: satrec.epochyr, epochDay: satrec.epochdays,
+      timestamp: date.toISOString(),
+    };
+  }
+
+  tick() {
+    const now = new Date();
+    const next = [];
+    for (const entry of this.satrecs.values()) {
+      const st = this._computeState(entry, now);
+      if (!st) continue;
+      next.push(st);
+      const trail = this.trails.get(st.noradId) || [];
+      trail.push({ lat: st.latitude, lon: st.longitude, alt: st.altitude, t: st.timestamp });
+      if (trail.length > 60) trail.shift();
+      this.trails.set(st.noradId, trail);
+    }
+    this.satellites = next;
+    this.meta.lastTickAt = now.toISOString();
+    this.emit();
+  }
+
+  scanCollisions() {
+    const grid = new SpatialGrid(Math.max(WARNING_KM, 10));
+    for (const s of this.satellites) grid.insert(s, s.eci.x, s.eci.y, s.eci.z);
+    const seen = new Set(); const found = [];
+    for (const s of this.satellites) {
+      for (const c of grid.queryNeighborCells(s.eci.x, s.eci.y, s.eci.z)) {
+        if (c.item.noradId === s.noradId) continue;
+        const key = [s.noradId, c.item.noradId].sort().join('|');
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const d = Math.sqrt((s.eci.x-c.item.eci.x)**2 + (s.eci.y-c.item.eci.y)**2 + (s.eci.z-c.item.eci.z)**2);
+        if (d <= WARNING_KM) {
+          const risk = d <= CRITICAL_KM ? 'critical' : d <= CRITICAL_KM*2 ? 'high' : 'moderate';
+          found.push({
+            pairKey: key,
+            a: { noradId: s.noradId, name: s.name, altitude: s.altitude, shell: s.shell },
+            b: { noradId: c.item.noradId, name: c.item.name, altitude: c.item.altitude, shell: c.item.shell },
+            separationKm: Number(d.toFixed(3)), risk, detectedAt: new Date().toISOString(),
+          });
+        }
+      }
+    }
+    found.sort((a, b) => a.separationKm - b.separationKm);
+    this.collisionPairs = found;
+
+    const counts = {};
+    for (const s of this.satellites) counts[s.shell] = (counts[s.shell] || 0) + 1;
+    this.shellCongestion = Object.entries(counts).map(([shell, count]) => ({ shell, count })).sort((a,b) => b.count - a.count);
+
+    this.meta.lastScanAt = new Date().toISOString();
+    this.collisionHistory.push({ t: this.meta.lastScanAt, count: found.length, closestKm: found[0]?.separationKm ?? null });
+    if (this.collisionHistory.length > 200) this.collisionHistory.shift();
+    this.emit();
+  }
+
+  sample() {
+    const n = this.satellites.length || 1;
+    const avgAltitude = this.satellites.reduce((s, x) => s + x.altitude, 0) / n;
+    const avgSpeed = this.satellites.reduce((s, x) => s + x.speed, 0) / n;
+    this.timeSeries.push({ t: new Date().toISOString(), avgAltitude, avgSpeed, satelliteCount: this.satellites.length });
+    if (this.timeSeries.length > 288) this.timeSeries.shift();
+    this.emit();
+  }
+
+  getStatistics() {
+    const n = this.satellites.length || 1;
+    const avgAltitude = this.satellites.reduce((s, x) => s + x.altitude, 0) / n;
+    const avgSpeed = this.satellites.reduce((s, x) => s + x.speed, 0) / n;
+    const avgIncl = this.satellites.reduce((s, x) => s + x.inclination, 0) / n;
+    const minAlt = this.satellites.reduce((m, x) => Math.min(m, x.altitude), Infinity);
+    const maxAlt = this.satellites.reduce((m, x) => Math.max(m, x.altitude), -Infinity);
+    const closest = this.collisionPairs[0] || null;
+    return {
+      totalSatellites: this.satrecs.size,
+      activeSatellites: this.satellites.length,
+      avgAltitudeKm: avgAltitude, avgSpeedKms: avgSpeed, avgInclinationDeg: avgIncl,
+      minAltitudeKm: Number.isFinite(minAlt) ? minAlt : null,
+      maxAltitudeKm: Number.isFinite(maxAlt) ? maxAlt : null,
+      closestApproachKm: closest ? closest.separationKm : null,
+      activeConjunctionWarnings: this.collisionPairs.length,
+      criticalConjunctions: this.collisionPairs.filter((p) => p.risk === 'critical').length,
+      shellDistribution: this.shellCongestion,
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
+  predictTrack(noradId, minutesAhead = 100, stepMinutes = 2) {
+    const entry = this.satrecs.get(String(noradId));
+    if (!entry) return [];
+    const now = Date.now(); const points = [];
+    for (let m = 0; m <= minutesAhead; m += stepMinutes) {
+      const st = this._computeState(entry, new Date(now + m * 60000));
+      if (st) points.push({ lat: st.latitude, lon: st.longitude, alt: st.altitude, minutesFromNow: m });
+    }
+    return points;
+  }
+
+  getDetail(noradId) {
+    const entry = this.satrecs.get(String(noradId));
+    const state = this.satellites.find((s) => s.noradId === String(noradId));
+    if (!entry || !state) return null;
+    return { ...state, tle: { line1: entry.line1, line2: entry.line2 }, trail: this.trails.get(String(noradId)) || [] };
+  }
+
+  start() {
+    this.fetchTLE().then(() => {
+      this.tick();
+      this.scanCollisions();
+      this.sample();
+      setInterval(() => this.tick(), 2000);
+      setInterval(() => this.scanCollisions(), 15000);
+      setInterval(() => this.sample(), 5 * 60 * 1000);
+      setInterval(() => this.fetchTLE(), 2 * 60 * 60 * 1000);
+    });
+  }
+}
+const engine = new Engine();
+
+function useEngine() {
+  const [, forceUpdate] = useState(0);
+  useEffect(() => engine.subscribe(() => forceUpdate((n) => n + 1)), []);
+  return engine;
+}
+
+/* ============================================================================
+   4. THREE.JS GLOBE LAYER
+   ============================================================================ */
+const TEX = {
+  day: 'https://unpkg.com/three-globe@2.31.1/example/img/earth-blue-marble.jpg',
+  night: 'https://unpkg.com/three-globe@2.31.1/example/img/earth-night.jpg',
+  specular: 'https://unpkg.com/three-globe@2.31.1/example/img/earth-water.png',
+  clouds: 'https://unpkg.com/three-globe@2.31.1/example/img/clouds.png',
+};
+const DAY_NIGHT_VERTEX = `varying vec2 vUv; varying vec3 vNormal;
+void main(){ vUv=uv; vNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`;
+const DAY_NIGHT_FRAGMENT = `uniform sampler2D dayTexture; uniform sampler2D nightTexture; uniform sampler2D specularTexture;
+uniform vec3 sunDirection; varying vec2 vUv; varying vec3 vNormal;
+void main(){
+  float intensity = dot(normalize(vNormal), normalize(sunDirection));
+  float blend = smoothstep(-0.15, 0.2, intensity);
+  vec3 dayColor = texture2D(dayTexture, vUv).rgb;
+  vec3 nightColor = texture2D(nightTexture, vUv).rgb * 1.4;
+  float spec = texture2D(specularTexture, vUv).r;
+  vec3 lit = dayColor + spec * 0.15 * max(intensity, 0.0);
+  vec3 color = mix(nightColor, lit, blend);
+  gl_FragColor = vec4(color, 1.0);
+}`;
+const ATMO_VERTEX = `varying vec3 vNormal; void main(){ vNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`;
+const ATMO_FRAGMENT = `uniform vec3 glowColor; varying vec3 vNormal;
+void main(){ float intensity=pow(0.68-dot(vNormal, vec3(0.0,0.0,1.0)), 3.2); gl_FragColor=vec4(glowColor,1.0)*intensity; }`;
+
+class Globe {
+  constructor(scene) {
+    this.scene = scene; this.group = new THREE.Group(); scene.add(this.group);
+    this.sunDirection = new THREE.Vector3(1, 0.3, 1).normalize();
+    this._buildStars(); this._buildEarth(); this._buildClouds(); this._buildAtmosphere(); this._buildBorders();
+  }
+  _buildEarth() {
+    const loader = new THREE.TextureLoader();
+    const geometry = new THREE.SphereGeometry(EARTH_RADIUS_UNITS, 96, 96);
+    this.earthMesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x0c2540 }));
+    this.group.add(this.earthMesh);
+    const day = loader.load(TEX.day, () => this._tryUpgrade());
+    const night = loader.load(TEX.night, () => this._tryUpgrade());
+    const spec = loader.load(TEX.specular, () => this._tryUpgrade());
+    [day, night, spec].forEach((t) => { t.colorSpace = THREE.SRGBColorSpace; });
+    this._tex = { day, night, spec };
+    this._shader = new THREE.ShaderMaterial({
+      uniforms: { dayTexture: { value: day }, nightTexture: { value: night }, specularTexture: { value: spec }, sunDirection: { value: this.sunDirection } },
+      vertexShader: DAY_NIGHT_VERTEX, fragmentShader: DAY_NIGHT_FRAGMENT,
+    });
+  }
+  _tryUpgrade() {
+    const { day, night, spec } = this._tex;
+    if (day.image && night.image && spec.image) this.earthMesh.material = this._shader;
+  }
+  _buildClouds() {
+    const loader = new THREE.TextureLoader();
+    const geometry = new THREE.SphereGeometry(EARTH_RADIUS_UNITS * 1.008, 96, 96);
+    const material = new THREE.MeshStandardMaterial({ transparent: true, opacity: 0.28, depthWrite: false });
+    loader.load(TEX.clouds, (tex) => { tex.colorSpace = THREE.SRGBColorSpace; material.alphaMap = tex; material.needsUpdate = true; });
+    this.cloudMesh = new THREE.Mesh(geometry, material); this.group.add(this.cloudMesh);
+  }
+  _buildAtmosphere() {
+    const geometry = new THREE.SphereGeometry(EARTH_RADIUS_UNITS * 1.15, 64, 64);
+    const material = new THREE.ShaderMaterial({
+      uniforms: { glowColor: { value: new THREE.Color(0x54d8ff) } },
+      vertexShader: ATMO_VERTEX, fragmentShader: ATMO_FRAGMENT,
+      blending: THREE.AdditiveBlending, side: THREE.BackSide, transparent: true, depthWrite: false,
+    });
+    this.atmosphereMesh = new THREE.Mesh(geometry, material); this.group.add(this.atmosphereMesh);
+  }
+  _buildStars() {
+    const count = 6000; const positions = new Float32Array(count * 3); const radius = 400;
+    for (let i = 0; i < count; i++) {
+      const theta = Math.random() * Math.PI * 2, phi = Math.acos(2 * Math.random() - 1);
+      const r = radius * (0.8 + Math.random() * 0.2);
+      positions[i*3] = r*Math.sin(phi)*Math.cos(theta);
+      positions[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
+      positions[i*3+2] = r*Math.cos(phi);
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const material = new THREE.PointsMaterial({ color: 0xbfd9ff, size: 0.55, sizeAttenuation: true, transparent: true, opacity: 0.85 });
+    this.stars = new THREE.Points(geometry, material); this.scene.add(this.stars);
+  }
+  async _buildBorders() {
+    this.borderGroup = new THREE.Group(); this.group.add(this.borderGroup);
+    try {
+      const res = await fetch('https://unpkg.com/world-atlas@2.0.2/countries-110m.json');
+      const topo = await res.json();
+      const borders = topojson.mesh(topo, topo.objects.countries, (a, b) => a !== b);
+      const material = new THREE.LineBasicMaterial({ color: 0x54f2ff, transparent: true, opacity: 0.28 });
+      for (const line of borders.coordinates) {
+        const points = line.map(([lon, lat]) => { const v = geodeticToVector3(lat, lon, 2); return new THREE.Vector3(v.x, v.y, v.z); });
+        this.borderGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), material));
+      }
+    } catch (err) { console.warn('[Globe] borders unavailable:', err.message); }
+  }
+  update(delta) { this.cloudMesh.rotation.y += delta * 0.012; this.stars.rotation.y += delta * 0.0006; }
+  dispose() {
+    this.group.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); });
+    this.scene.remove(this.group); this.scene.remove(this.stars);
+  }
+}
+
+const SHELL_COLORS = {
+  'VLEO (<400km)': 0xff6b6b, 'Shell 1 (400-500km)': 0xffb454, 'Shell 2 (500-550km)': 0x54f2ff,
+  'Shell 3 (550-570km)': 0x54ff9d, 'Shell 4 (570-600km)': 0xb28dff, 'Extended (>600km)': 0xffffff,
+};
+const MAX_INSTANCES = 8000;
+
+class SatelliteLayer {
+  constructor(scene) {
+    this.scene = scene; this.group = new THREE.Group(); scene.add(this.group);
+    const geometry = new THREE.SphereGeometry(0.008, 6, 6);
+    const material = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
+    this.mesh = new THREE.InstancedMesh(geometry, material, MAX_INSTANCES);
+    this.mesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(MAX_INSTANCES * 3), 3);
+    this.mesh.count = 0; this.group.add(this.mesh);
+    this.indexToId = [];
+    const ringGeo = new THREE.RingGeometry(0.02, 0.026, 32);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xffb454, side: THREE.DoubleSide, transparent: true, opacity: 0.9 });
+    this.selectionRing = new THREE.Mesh(ringGeo, ringMat); this.selectionRing.visible = false; this.group.add(this.selectionRing);
+    this._dummy = new THREE.Object3D(); this._color = new THREE.Color();
+  }
+  update(satellites) {
+    const n = Math.min(satellites.length, MAX_INSTANCES);
+    this.indexToId = new Array(n);
+    for (let i = 0; i < n; i++) {
+      const s = satellites[i];
+      const v = geodeticToVector3(s.latitude, s.longitude, s.altitude);
+      this._dummy.position.set(v.x, v.y, v.z); this._dummy.lookAt(0, 0, 0); this._dummy.updateMatrix();
+      this.mesh.setMatrixAt(i, this._dummy.matrix);
+      this._color.set(SHELL_COLORS[s.shell] ?? 0x54f2ff);
+      this.mesh.setColorAt(i, this._color);
+      this.indexToId[i] = s.noradId;
+    }
+    this.mesh.count = n;
+    this.mesh.instanceMatrix.needsUpdate = true;
+    if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
+  }
+  setSelected(satState) {
+    if (!satState) { this.selectionRing.visible = false; return; }
+    const v = geodeticToVector3(satState.latitude, satState.longitude, satState.altitude);
+    this.selectionRing.position.set(v.x, v.y, v.z); this.selectionRing.lookAt(0, 0, 0); this.selectionRing.visible = true;
+  }
+  updateFrame(delta) { this.selectionRing.rotation.z += delta * 0.6; }
+  dispose() { this.mesh.geometry.dispose(); this.mesh.material.dispose(); this.scene.remove(this.group); }
+}
+
+class CameraControls {
+  constructor(camera, dom, target = new THREE.Vector3(0,0,0)) {
+    this.camera = camera; this.dom = dom; this.target = target;
+    this.radius = camera.position.length(); this.minRadius = 3.2; this.maxRadius = 14;
+    this.theta = Math.atan2(camera.position.x, camera.position.z);
+    this.phi = Math.acos(THREE.MathUtils.clamp(camera.position.y / this.radius, -1, 1));
+    this.targetTheta = this.theta; this.targetPhi = this.phi; this.targetRadius = this.radius;
+    this.autoRotate = true; this.autoRotateSpeed = 0.035; this.dragging = false; this.lastPointer = {x:0,y:0};
+    this._bind(); this._apply();
+  }
+  _bind() {
+    this.onDown = (e) => { this.dragging = true; this.autoRotate = false; clearTimeout(this.idleTimer); this.lastPointer = {x:e.clientX,y:e.clientY}; };
+    this.onMove = (e) => {
+      if (!this.dragging) return;
+      const dx = e.clientX - this.lastPointer.x, dy = e.clientY - this.lastPointer.y;
+      this.lastPointer = {x:e.clientX,y:e.clientY};
+      this.targetTheta -= dx * 0.005;
+      this.targetPhi = THREE.MathUtils.clamp(this.targetPhi - dy * 0.005, 0.15, Math.PI - 0.15);
+    };
+    this.onUp = () => { this.dragging = false; this.idleTimer = setTimeout(() => this.autoRotate = true, 6000); };
+    this.onWheel = (e) => { e.preventDefault(); this.targetRadius = THREE.MathUtils.clamp(this.targetRadius + e.deltaY * 0.0035, this.minRadius, this.maxRadius); };
+    this.dom.addEventListener('pointerdown', this.onDown);
+    window.addEventListener('pointermove', this.onMove);
+    window.addEventListener('pointerup', this.onUp);
+    this.dom.addEventListener('wheel', this.onWheel, { passive: false });
+  }
+  _apply() {
+    const s = Math.sin(this.phi) * this.radius;
+    this.camera.position.x = s * Math.sin(this.theta);
+    this.camera.position.y = Math.cos(this.phi) * this.radius;
+    this.camera.position.z = s * Math.cos(this.theta);
+    this.camera.lookAt(this.target);
+  }
+  update(delta) {
+    if (this.autoRotate) this.targetTheta += this.autoRotateSpeed * delta;
+    this.theta += (this.targetTheta - this.theta) * 0.08;
+    this.phi += (this.targetPhi - this.phi) * 0.08;
+    this.radius += (this.targetRadius - this.radius) * 0.12;
+    this._apply();
+  }
+  focusOn(vector3, distance = 4.5) {
+    this.autoRotate = false; clearTimeout(this.idleTimer);
+    const dir = vector3.clone().normalize();
+    this.targetTheta = Math.atan2(dir.x, dir.z);
+    this.targetPhi = Math.acos(THREE.MathUtils.clamp(dir.y, -1, 1));
+    this.targetRadius = distance;
+  }
+  dispose() {
+    this.dom.removeEventListener('pointerdown', this.onDown);
+    window.removeEventListener('pointermove', this.onMove);
+    window.removeEventListener('pointerup', this.onUp);
+    this.dom.removeEventListener('wheel', this.onWheel);
+    clearTimeout(this.idleTimer);
+  }
+}
+
+/* ============================================================================
+   5. REACT: GlobeView
+   ============================================================================ */
+function GlobeView({ selectedId, onSelect }) {
+  const containerRef = useRef(null);
+  const selectedIdRef = useRef(selectedId);
+  selectedIdRef.current = selectedId;
+  const stateRef = useRef({});
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const width = container.clientWidth, height = container.clientHeight;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 1000);
+    camera.position.set(0, 2.4, 7.5);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(width, height);
+    renderer.setClearColor(0x05070d, 1);
+    container.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0x223349, 1.2));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(5,2,5); scene.add(sun);
+
+    const globe = new Globe(scene);
+    const satLayer = new SatelliteLayer(scene);
+    const controls = new CameraControls(camera, renderer.domElement);
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    function onClick(e) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObject(satLayer.mesh);
+      if (hits.length) {
+        const id = satLayer.indexToId[hits[0].instanceId];
+        if (id) onSelect(id);
+      }
+    }
+    renderer.domElement.addEventListener('click', onClick);
+
+    function onResize() {
+      const w = container.clientWidth, h = container.clientHeight;
+      camera.aspect = w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h);
+    }
+    const ro = new ResizeObserver(onResize); ro.observe(container);
+
+    const clock = new THREE.Clock();
+    let rafId; let lastSatsRef = null;
+    function animate() {
+      rafId = requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), 0.1);
+      if (engine.satellites !== lastSatsRef) { satLayer.update(engine.satellites); lastSatsRef = engine.satellites; }
+      const sel = selectedIdRef.current ? engine.satellites.find((s) => s.noradId === selectedIdRef.current) : null;
+      satLayer.setSelected(sel);
+      globe.update(delta); satLayer.updateFrame(delta); controls.update(delta);
+      renderer.render(scene, camera);
+    }
+    animate();
+    stateRef.current = { controls };
+
+    return () => {
+      cancelAnimationFrame(rafId); ro.disconnect();
+      renderer.domElement.removeEventListener('click', onClick);
+      controls.dispose(); globe.dispose(); satLayer.dispose(); renderer.dispose();
+      if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
+    };
+  }, []);
+
+  useEffect(() => {
+    const { controls } = stateRef.current;
+    if (!controls || !selectedId) return;
+    const sat = engine.satellites.find((s) => s.noradId === selectedId);
+    if (sat) {
+      const p = geodeticToVector3(sat.latitude, sat.longitude, sat.altitude);
+      controls.focusOn(new THREE.Vector3(p.x, p.y, p.z));
+    }
+  }, [selectedId]);
+
+  return <div ref={containerRef} className="globe-canvas-host" />;
+}
+
+/* ============================================================================
+   6. SMALL SHARED UI PRIMITIVES
+   ============================================================================ */
+function GlassPanel({ title, eyebrow, right, children, scroll }) {
+  return (
+    <section className="glass glass-corner panel">
+      {(title || right) && (
+        <div className="panel-header">
+          <div>{eyebrow && <div className="eyebrow">{eyebrow}</div>}{title && <h2 className="panel-title">{title}</h2>}</div>
+          {right}
+        </div>
+      )}
+      <div className={`panel-body ${scroll ? 'panel-scroll' : ''}`}>{children}</div>
+    </section>
+  );
+}
+function BarChart({ data }) {
+  if (!data || data.length === 0) return <div className="empty-state">No data yet</div>;
+  const max = Math.max(...data.map((d) => d.count), 1);
+  const colors = ['#ff6b6b','#ffb454','#54f2ff','#54ff9d','#b28dff','#ffffff'];
+  return (
+    <div className="bar-chart">
+      {data.map((d, i) => (
+        <div className="bar-row" key={d.shell}>
+          <span className="bar-row-label" title={d.shell}>{d.shell}</span>
+          <div className="bar-track"><div className="bar-fill" style={{ width: `${(d.count/max)*100}%`, background: colors[i % colors.length] }} /></div>
+          <span className="bar-row-value">{d.count}</span>
+        </div>
+      ))}
     </div>
+  );
+}
+function SparkLine({ data, color = '#54f2ff', height = 160, valueKey = 'value' }) {
+  if (!data || data.length < 2) return <div className="empty-state" style={{ padding: '40px 8px' }}>Collecting samples…</div>;
+  const values = data.map((d) => d[valueKey]).filter((v) => v !== null && v !== undefined);
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 1;
+  const w = 100, h = height;
+  const points = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * w;
+    const y = h - ((d[valueKey] - min) / range) * (h - 16) - 8;
+    return `${x},${y}`;
+  }).join(' ');
+  const areaPoints = `0,${h} ${points} ${w},${h}`;
+  const gradId = `grad-${valueKey}-${Math.random().toString(36).slice(2,7)}`;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={height} preserveAspectRatio="none">
+      <defs><linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor={color} stopOpacity="0.35" /><stop offset="100%" stopColor={color} stopOpacity="0" />
+      </linearGradient></defs>
+      <polygon points={areaPoints} fill={`url(#${gradId})`} />
+      <polyline points={points} fill="none" stroke={color} strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
 
-    <script>
-        particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 110 },
-                "color": { "value": "#00f2ff" },
-                "shape": { "type": "circle" },
-                "opacity": { "value": 0.25, "random": true },
-                "size": { "value": 2.5 },
-                "line_linked": { "enable": true, "distance": 150, "color": "#00f2ff", "opacity": 0.18, "width": 1 },
-                "move": { "enable": true, "speed": 1.5 }
-            }
-        });
+/* ============================================================================
+   7. LAYOUT: Header, Sidebar, LoadingScreen
+   ============================================================================ */
+const STATUS_LABEL = { connecting: 'CONNECTING', live: 'LIVE FEED', error: 'USING SEED DATA' };
+function Header({ connectionState, satelliteCount }) {
+  const [now, setNow] = useState(new Date());
+  useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t); }, []);
+  return (
+    <header className="app-header glass" style={{ borderRadius: 0, borderLeft: 'none', borderTop: 'none' }}>
+      <div className="header-inner">
+        <div className="brand">
+          <svg width="22" height="22" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#54f2ff" strokeWidth="6" opacity="0.5"/><circle cx="50" cy="50" r="6" fill="#54f2ff"/><ellipse cx="50" cy="50" rx="44" ry="16" fill="none" stroke="#54f2ff" strokeWidth="2" opacity="0.35"/></svg>
+          <div><div className="brand-title">ORBITAL</div><div className="brand-sub eyebrow">SATELLITE INTELLIGENCE PLATFORM</div></div>
+        </div>
+        <div className="header-mid">
+          <div className="header-stat"><span className="eyebrow">TRACKING</span><span className="data-value">{satelliteCount.toLocaleString()}</span></div>
+          <div className="header-stat"><span className="eyebrow">CONSTELLATION</span><span className="data-value">STARLINK</span></div>
+        </div>
+        <div className="header-right">
+          <div className="conn-pill"><span className={`status-dot ${connectionState==='live'?'':connectionState==='error'?'warn':'warn'}`} /><span className="mono">{STATUS_LABEL[connectionState] || 'INITIALIZING'}</span></div>
+          <div className="clock mono">{now.toUTCString().split(' ')[4]} UTC</div>
+        </div>
+      </div>
+    </header>
+  );
+}
 
-        const canvas = document.getElementById('matrix-rain');
-        const ctx = canvas.getContext('2d');
+const NAV_ITEMS = [
+  { id: 'globe', label: 'Globe' }, { id: 'dashboard', label: 'Dashboard' },
+  { id: 'explorer', label: 'Explorer' }, { id: 'collisions', label: 'Collisions' }, { id: 'analytics', label: 'Analytics' },
+];
+function Sidebar({ active, onChange, criticalCount }) {
+  return (
+    <nav className="app-sidebar glass" style={{ borderRadius: 0, borderLeft: 'none', borderBottom: 'none' }}>
+      <div className="sidebar-items">
+        {NAV_ITEMS.map(({ id, label }) => (
+          <button key={id} className={`sidebar-btn ${active===id?'active':''}`} onClick={() => onChange(id)} title={label}>
+            <NavIcon id={id} />
+            {id === 'collisions' && criticalCount > 0 && <span className="sidebar-badge">{criticalCount}</span>}
+            <span className="sidebar-label">{label}</span>
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+}
+function NavIcon({ id }) {
+  const common = { width: 19, height: 19, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6 };
+  if (id === 'globe') return <svg {...common}><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>;
+  if (id === 'dashboard') return <svg {...common}><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>;
+  if (id === 'explorer') return <svg {...common}><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>;
+  if (id === 'collisions') return <svg {...common}><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>;
+  return <svg {...common}><path d="M4 20V10M12 20V4M20 20v-7"/></svg>;
+}
+function LoadingScreen({ message }) {
+  return (
+    <div className="loading-screen">
+      <div className="loading-ring" />
+      <div><div className="loading-title" style={{textAlign:'center'}}>ORBITAL</div><div className="loading-sub">{message}</div></div>
+    </div>
+  );
+}
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+/* ============================================================================
+   8. DASHBOARD VIEW
+   ============================================================================ */
+function StatCard({ label, value, unit, accent, trend }) {
+  return (
+    <div className={`stat-card ${accent ? 'accent-'+accent : ''}`}>
+      <div className="eyebrow">{label}</div>
+      <div className="stat-value">{value}{unit && <span className="stat-unit">{unit}</span>}</div>
+      {trend && <div className="stat-trend">{trend}</div>}
+    </div>
+  );
+}
+function FleetGrowthPlaceholder({ total }) {
+  const months = 8;
+  const bars = Array.from({ length: months }, (_, i) => Math.round((total||0) * (0.55 + (i/(months-1))*0.45)));
+  const max = Math.max(...bars, 1);
+  return <div className="placeholder-chart">{bars.map((v,i) => <div key={i} className="placeholder-bar" style={{ height: `${(v/max)*100}%` }} title={`${v} sats`} />)}</div>;
+}
+function Dashboard({ stats }) {
+  if (!stats) return <div className="overlay-panel overlay-center"><GlassPanel title="Fleet Overview" eyebrow="Dashboard"><div className="empty-state">Loading live constellation statistics…</div></GlassPanel></div>;
+  return (
+    <div className="overlay-panel overlay-full panel-scroll">
+      <GlassPanel title="Fleet Overview" eyebrow={`Updated ${timeAgo(stats.generatedAt)}`} right={<span className="risk-badge risk-low"><span className="status-dot"/>Nominal</span>} scroll>
+        <div className="stat-grid">
+          <StatCard label="Total Satellites" value={formatNumber(stats.totalSatellites,0)} />
+          <StatCard label="Active / Propagating" value={formatNumber(stats.activeSatellites,0)} accent="success" />
+          <StatCard label="Avg Altitude" value={formatNumber(stats.avgAltitudeKm,1)} unit="km" />
+          <StatCard label="Avg Speed" value={formatNumber(stats.avgSpeedKms,2)} unit="km/s" />
+          <StatCard label="Closest Approach" value={stats.closestApproachKm!==null?formatNumber(stats.closestApproachKm,2):'—'} unit="km" accent={stats.closestApproachKm!==null && stats.closestApproachKm<5?'danger':'amber'} />
+          <StatCard label="Conjunction Warnings" value={formatNumber(stats.activeConjunctionWarnings,0)} accent={stats.criticalConjunctions>0?'danger':'amber'} trend={`${stats.criticalConjunctions} critical`} />
+        </div>
+        <div className="dashboard-grid">
+          <div><div className="eyebrow" style={{marginBottom:8}}>ORBITAL SHELL DENSITY</div><BarChart data={stats.shellDistribution} /></div>
+          <div>
+            <div className="eyebrow" style={{marginBottom:8}}>FLEET GROWTH (est. cadence)</div>
+            <FleetGrowthPlaceholder total={stats.totalSatellites} />
+            <div className="placeholder-note">Estimate only — real growth history needs persisted daily snapshots (see the full server build's Postgres schema).</div>
+          </div>
+        </div>
+        <div className="kv-grid" style={{marginTop:18,borderTop:'1px solid var(--panel-border)',paddingTop:14}}>
+          <div className="kv-item"><span className="kv-label">Min Altitude</span><span className="kv-value">{formatNumber(stats.minAltitudeKm,1)} km</span></div>
+          <div className="kv-item"><span className="kv-label">Max Altitude</span><span className="kv-value">{formatNumber(stats.maxAltitudeKm,1)} km</span></div>
+          <div className="kv-item"><span className="kv-label">Avg Inclination</span><span className="kv-value">{formatNumber(stats.avgInclinationDeg,2)}°</span></div>
+          <div className="kv-item"><span className="kv-label">TLE Source Age</span><span className="kv-value">{timeAgo(engine.meta.tleFetchedAt)}</span></div>
+        </div>
+      </GlassPanel>
+    </div>
+  );
+}
 
-        const chars = "01アイウエオ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const fontSize = 14;
-        const columns = canvas.width / fontSize;
-        const drops = Array(Math.floor(columns)).fill(1);
+/* ============================================================================
+   9. EXPLORER VIEW
+   ============================================================================ */
+const SHELLS = ['', 'VLEO (<400km)', 'Shell 1 (400-500km)', 'Shell 2 (500-550km)', 'Shell 3 (550-570km)', 'Shell 4 (570-600km)', 'Extended (>600km)'];
+function SearchFilters({ filters, onChange }) {
+  const set = (key) => (e) => onChange({ ...filters, [key]: e.target.value });
+  return (
+    <div>
+      <label className="field-label">Search by name or NORAD ID</label>
+      <input className="text-input" placeholder="e.g. STARLINK-1130 or 45178" value={filters.q} onChange={set('q')} />
+      <div className="row" style={{marginTop:10}}>
+        <div><label className="field-label">Orbital shell</label>
+          <select className="select-input" value={filters.shell} onChange={set('shell')}>
+            {SHELLS.map((s) => <option key={s} value={s}>{s || 'All shells'}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="row" style={{marginTop:10}}>
+        <div><label className="field-label">Min altitude (km)</label><input className="text-input" type="number" value={filters.minAltitude} onChange={set('minAltitude')} /></div>
+        <div><label className="field-label">Max altitude (km)</label><input className="text-input" type="number" value={filters.maxAltitude} onChange={set('maxAltitude')} /></div>
+      </div>
+      <div className="row" style={{marginTop:10}}>
+        <div><label className="field-label">Min inclination (°)</label><input className="text-input" type="number" value={filters.minInclination} onChange={set('minInclination')} /></div>
+        <div><label className="field-label">Max inclination (°)</label><input className="text-input" type="number" value={filters.maxInclination} onChange={set('maxInclination')} /></div>
+      </div>
+    </div>
+  );
+}
+const DEFAULT_FILTERS = { q:'', shell:'', minAltitude:'', maxAltitude:'', minInclination:'', maxInclination:'' };
+function SatelliteExplorer({ satellites, selectedId, onSelect }) {
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const results = useMemo(() => {
+    let list = satellites;
+    const needle = filters.q.trim().toLowerCase();
+    if (needle) list = list.filter((s) => s.name.toLowerCase().includes(needle) || s.noradId.includes(needle));
+    if (filters.shell) list = list.filter((s) => s.shell === filters.shell);
+    if (filters.minAltitude !== '') list = list.filter((s) => s.altitude >= Number(filters.minAltitude));
+    if (filters.maxAltitude !== '') list = list.filter((s) => s.altitude <= Number(filters.maxAltitude));
+    if (filters.minInclination !== '') list = list.filter((s) => s.inclination >= Number(filters.minInclination));
+    if (filters.maxInclination !== '') list = list.filter((s) => s.inclination <= Number(filters.maxInclination));
+    return list.slice(0, 300);
+  }, [satellites, filters]);
+  return (
+    <div className="overlay-panel overlay-left">
+      <GlassPanel title="Satellite Explorer" eyebrow={`${results.length.toLocaleString()} matches`} scroll>
+        <SearchFilters filters={filters} onChange={setFilters} />
+        <div className="explorer-list panel-scroll">
+          {results.length === 0 && <div className="empty-state">No satellites match these filters</div>}
+          {results.map((s) => (
+            <button key={s.noradId} className={`explorer-row ${selectedId===s.noradId?'active':''}`} onClick={() => onSelect(s.noradId)}>
+              <div className="explorer-row-main"><span className="explorer-name">{s.name}</span><span className="explorer-norad mono">#{s.noradId}</span></div>
+              <div className="explorer-row-meta mono"><span>{formatNumber(s.altitude,0)} km</span><span>{formatNumber(s.speed,2)} km/s</span><span>{formatNumber(s.inclination,1)}°</span></div>
+            </button>
+          ))}
+        </div>
+      </GlassPanel>
+    </div>
+  );
+}
+function Kv({ label, value }) { return <div className="kv-item"><span className="kv-label">{label}</span><span className="kv-value">{value}</span></div>; }
+function SatelliteDetailPanel({ noradId, onClose }) {
+  const eng = useEngine();
+  if (!noradId) return null;
+  const detail = eng.getDetail(noradId);
+  const predicted = detail ? eng.predictTrack(noradId, 100, 2) : [];
+  return (
+    <div className="overlay-panel overlay-right">
+      <GlassPanel title={detail?.name || 'Acquiring…'} eyebrow={detail ? `NORAD ${detail.noradId} · ${detail.shell}` : 'Fetching telemetry'} right={<button className="btn" onClick={onClose}>Close</button>} scroll>
+        {!detail && <div className="empty-state">Acquiring telemetry lock…</div>}
+        {detail && (
+          <>
+            <div className="kv-grid">
+              <Kv label="Latitude" value={`${formatNumber(detail.latitude,3)}°`} />
+              <Kv label="Longitude" value={`${formatNumber(detail.longitude,3)}°`} />
+              <Kv label="Altitude" value={`${formatNumber(detail.altitude,2)} km`} />
+              <Kv label="Speed" value={`${formatNumber(detail.speed,3)} km/s`} />
+              <Kv label="Inclination" value={`${formatNumber(detail.inclination,3)}°`} />
+              <Kv label="Eccentricity" value={formatNumber(detail.eccentricity,5)} />
+              <Kv label="Orbital Period" value={formatDuration(detail.periodMinutes)} />
+              <Kv label="Orbit Number" value={detail.revNumber ?? '—'} />
+              <Kv label="Epoch (yr/day)" value={`${detail.epochYear ?? '—'} / ${formatNumber(detail.epochDay,4)}`} />
+              <Kv label="Ground Position" value={`${formatNumber(detail.latitude,2)}, ${formatNumber(detail.longitude,2)}`} />
+            </div>
+            <div style={{marginTop:16}}>
+              <div className="eyebrow" style={{marginBottom:6}}>RAW TLE</div>
+              <pre className="tle-block mono">{detail.tle.line1}{"\n"}{detail.tle.line2}</pre>
+            </div>
+            <div style={{marginTop:16}}>
+              <div className="eyebrow" style={{marginBottom:6}}>PREDICTED GROUND TRACK (next 100 min)</div>
+              <div className="track-preview panel-scroll">
+                {predicted.filter((_,i) => i%5===0).map((p,i) => (
+                  <div key={i} className="track-row mono"><span>T+{p.minutesFromNow}m</span><span>{formatNumber(p.lat,2)}, {formatNumber(p.lon,2)}</span><span>{formatNumber(p.alt,1)} km</span></div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </GlassPanel>
+    </div>
+  );
+}
 
-        function drawRain() {
-            ctx.fillStyle = 'rgba(2, 2, 2, 0.08)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.fillStyle = '#00f2ff';
-            ctx.font = `${fontSize}px monospace`;
+/* ============================================================================
+   10. COLLISIONS VIEW
+   ============================================================================ */
+function CollisionList({ pairs, onSelectPair }) {
+  if (!pairs || pairs.length === 0) return <div className="empty-state">No close approaches within the current warning threshold.</div>;
+  return (
+    <div className="collision-list panel-scroll">
+      {pairs.map((p) => (
+        <button key={p.pairKey} className="collision-row" onClick={() => onSelectPair(p)}>
+          <div className="collision-row-top"><span className={`risk-badge risk-${p.risk}`}>{p.risk}</span><span className="mono collision-sep">{formatNumber(p.separationKm,3)} km</span></div>
+          <div className="collision-row-names"><span>{p.a.name}</span><span className="collision-x">×</span><span>{p.b.name}</span></div>
+          <div className="collision-row-meta mono">#{p.a.noradId} / #{p.b.noradId} &nbsp;·&nbsp; {p.a.shell}</div>
+        </button>
+      ))}
+    </div>
+  );
+}
+function CollisionIntelligence({ onSelectSatellite }) {
+  const eng = useEngine();
+  const pairs = eng.collisionPairs;
+  const critical = pairs.filter((p) => p.risk === 'critical').length;
+  const high = pairs.filter((p) => p.risk === 'high').length;
+  const moderate = pairs.filter((p) => p.risk === 'moderate').length;
+  return (
+    <div className="overlay-panel overlay-left overlay-tall">
+      <GlassPanel title="Collision Intelligence" eyebrow={`Scan cadence 15s · last scan ${timeAgo(eng.meta.lastScanAt)}`} scroll>
+        <div className="risk-summary">
+          <div className="risk-summary-item"><span className="risk-badge risk-critical">critical</span><span className="mono">{critical}</span></div>
+          <div className="risk-summary-item"><span className="risk-badge risk-high">high</span><span className="mono">{high}</span></div>
+          <div className="risk-summary-item"><span className="risk-badge risk-moderate">moderate</span><span className="mono">{moderate}</span></div>
+        </div>
+        <CollisionList pairs={pairs} onSelectPair={(p) => onSelectSatellite(p.a.noradId)} />
+        <div style={{marginTop:18}}>
+          <div className="eyebrow" style={{marginBottom:8}}>CONGESTION BY ORBITAL SHELL</div>
+          <BarChart data={eng.shellCongestion} />
+        </div>
+      </GlassPanel>
+    </div>
+  );
+}
 
-            for (let i = 0; i < drops.length; i++) {
-                const text = chars[Math.floor(Math.random() * chars.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+/* ============================================================================
+   11. ANALYTICS VIEW
+   ============================================================================ */
+function ChartCard({ title, children }) { return <div className="chart-card"><div className="eyebrow" style={{marginBottom:6}}>{title}</div>{children}</div>; }
+function Analytics({ shellDistribution }) {
+  const eng = useEngine();
+  const series = eng.timeSeries;
+  const history = eng.collisionHistory;
+  const dailyActivity = useMemo(() => {
+    const buckets = new Array(24).fill(0);
+    for (const s of series) buckets[new Date(s.t).getHours()] += 1;
+    return buckets;
+  }, [series]);
+  return (
+    <div className="overlay-panel overlay-full panel-scroll">
+      <GlassPanel title="Constellation Analytics" eyebrow="Rolling telemetry history, sampled every 5 minutes" scroll>
+        <div className="analytics-grid">
+          <ChartCard title="ALTITUDE HISTORY (avg, km)"><SparkLine data={series} color="#54f2ff" valueKey="avgAltitude" /></ChartCard>
+          <ChartCard title="SPEED HISTORY (avg, km/s)"><SparkLine data={series} color="#ffb454" valueKey="avgSpeed" /></ChartCard>
+          <ChartCard title="CONJUNCTION TRENDS (active warnings)"><SparkLine data={history} color="#ff4d6d" valueKey="count" /></ChartCard>
+          <ChartCard title="ORBITAL SHELL STATISTICS"><BarChart data={shellDistribution} /></ChartCard>
+        </div>
+        <div style={{marginTop:18}}>
+          <div className="eyebrow" style={{marginBottom:8}}>DAILY ACTIVITY (samples collected today)</div>
+          <div className="activity-heat">{dailyActivity.map((v,i) => <div key={i} className="activity-cell" style={{opacity: 0.15 + Math.min(v,10)*0.08}} title={`Hour ${i}:00 — ${v} samples`} />)}</div>
+          <div className="placeholder-note">Heat reflects propagation/collision sampling density per hour from the live rolling buffer.</div>
+        </div>
+      </GlassPanel>
+    </div>
+  );
+}
 
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
-            }
-        }
+/* ============================================================================
+   12. APP ROOT
+   ============================================================================ */
+function Vital({ label, value, danger }) {
+  return <div className="vitals-item"><span className="eyebrow">{label}</span><span className="data-value" style={danger?{color:'var(--danger)'}:undefined}>{value}</span></div>;
+}
+function App() {
+  const eng = useEngine();
+  const [activeView, setActiveView] = useState('globe');
+  const [selectedId, setSelectedId] = useState(null);
 
-        setInterval(drawRain, 45);
+  useEffect(() => { engine.start(); }, []);
 
-        const terminalInput = document.getElementById('terminal-input');
-        const outputLog = document.getElementById('output-log');
+  const initializing = eng.satellites.length === 0;
+  const connectionState = eng.meta.tleError && eng.satellites.length > 0 ? 'error' : (eng.satellites.length > 0 ? 'live' : 'connecting');
+  const stats = eng.satellites.length > 0 ? eng.getStatistics() : null;
+  const criticalCount = stats ? stats.criticalConjunctions : 0;
 
-        terminalInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const cmd = this.value.toLowerCase().trim();
-                let response = "SIGNAL FRAGMENTED.";
+  return (
+    <div className="app-shell">
+      {initializing && <LoadingScreen message="Acquiring live Starlink telemetry from CelesTrak…" />}
+      <Sidebar active={activeView} onChange={setActiveView} criticalCount={criticalCount} />
+      <Header connectionState={connectionState} satelliteCount={eng.satellites.length} />
+      <main className="app-main">
+        <GlobeView selectedId={selectedId} onSelect={setSelectedId} />
+        {stats && (
+          <div className="vitals-strip glass">
+            <Vital label="Total" value={formatNumber(stats.totalSatellites,0)} />
+            <Vital label="Active" value={formatNumber(stats.activeSatellites,0)} />
+            <Vital label="Avg Alt" value={`${formatNumber(stats.avgAltitudeKm,0)} km`} />
+            <Vital label="Avg Speed" value={`${formatNumber(stats.avgSpeedKms,2)} km/s`} />
+            <Vital label="Closest" value={stats.closestApproachKm!==null?`${formatNumber(stats.closestApproachKm,2)} km`:'—'} danger={stats.closestApproachKm!==null && stats.closestApproachKm<5} />
+          </div>
+        )}
+        {activeView === 'dashboard' && <Dashboard stats={stats} />}
+        {activeView === 'explorer' && <SatelliteExplorer satellites={eng.satellites} selectedId={selectedId} onSelect={setSelectedId} />}
+        {activeView === 'collisions' && <CollisionIntelligence onSelectSatellite={setSelectedId} />}
+        {activeView === 'analytics' && <Analytics shellDistribution={stats?.shellDistribution} />}
+        {selectedId && <SatelliteDetailPanel noradId={selectedId} onClose={() => setSelectedId(null)} />}
+      </main>
+    </div>
+  );
+}
 
-                if (cmd === 'help') response = "COMMANDS: maxigram | projects | status | contact";
-                else if (cmd === 'maxigram') response = "NEURAL CORE AWAKENING. GLOBAL UPLINK IMMINENT.";
-                else if (cmd === 'projects') response = "ADVERSARIAL DEFENSE • DEEPFAKE NEUTRALIZER • QUANTUM ENCRYPTION";
-                else if (cmd === 'status') response = "ALL NEURAL NODES ALIGNED. FIELD STRENGTH: 99.7%";
-                else if (cmd === 'contact') response = "09033879819 | samuelojimaemmanuel@gmail.com";
-
-                outputLog.innerHTML = `<span style="color: var(--grok-cyan);">> ${response}</span>`;
-                this.value = "";
-            }
-        });
-
-        function toggleAudio() {
-            const btn = document.getElementById('audio-toggle');
-            btn.innerText = btn.innerText === "SIGNAL_OFF" ? "SIGNAL_LIVE" : "SIGNAL_OFF";
-        }
-    </script>
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+window.__orbitalMounted = true;
+</script>
 </body>
-    </html>
+</html>
